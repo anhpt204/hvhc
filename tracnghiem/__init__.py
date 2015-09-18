@@ -1,0 +1,1 @@
+default_app_config = 'tracnghiem.apps.TracNghiemConfig'
