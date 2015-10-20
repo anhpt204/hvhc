@@ -12,6 +12,7 @@ from daotao.models import DoiTuong, MonThi, Lop
 from django.utils import timezone
 from hvhc import HOC_KY, HK1
 from hrm.models import GiaoVien
+from datetime import date
 
 class BoDe(models.Model):
     '''
@@ -43,6 +44,9 @@ class BoDe(models.Model):
         
         super(BoDe, self).save(*args, **kwargs)
         # ma = ma doi tuong.ma mon.ngay.thang.nam
+
+#     def clone(self):
+        
     
 class DeThi(models.Model):
     '''
@@ -69,6 +73,7 @@ class DeThi(models.Model):
     def __unicode__(self):
         return u'%s (%s)' %(self.ma_de_thi, self.ngan_hang)
     
+        
 class CaThi(models.Model):
     ten_ca_thi = CharField(max_length=100,
                            verbose_name="Tên ca thi")
@@ -112,6 +117,12 @@ class CaThi(models.Model):
     def __unicode__(self):
         return u'%s-%s-%s' %(self.doi_tuong, self.mon_thi, self.lop)
     
+    @property
+    def da_thi(self):
+        if date.today() < self.ngay_thi:
+            return True
+        return False
+
 #     def save(self, *args, **kwargs):
 #         # lay ngan hang de thi tuong ung voi doi_tuong va mon_thi
 #         ngan_hang_dt = BoDe.objects.filter(doi_tuong=self.doi_tuong, 

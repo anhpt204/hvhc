@@ -19,7 +19,7 @@ Sinh đề thi tự luận
   <h4>Năm học: {{ object.nam_hoc }} </h4>  
   <h4>Ngày thi: {{ object.ngay_thi|date:"d / m / Y" }}</h4>
   <h4>Số đề thi cần sinh ra: {{ object.so_de_thi }}</h4>
-  
+  {% if object.da_thi %}
   <form action="sinhde/" method="POST">
   {% csrf_token %}
   	<h4>Chọn một trong các bộ đề sau: </h4>
@@ -31,18 +31,34 @@ Sinh đề thi tự luận
   	{% endfor %}
   	<br />
  	
+ 	
  	<input class="btn btn-primary btn-lg" type = "submit" name="sinhde" value="Sinh đề thi mới" />
+ 	
   	<br />
   </form>
+  {% else %}
+  	<h1>Ca thi này đã được tổ chức thi rồi</h1>
+  {% endif %}
  
 
-<h3>Các đề đã được sinh ra:
+<h3>Các đề đã được sinh ra: <br />
   {% for dt in object.ds_de_thi.all %}
   	<a href='/quiz/tuluan/preview/dethi/{{ dt.pk }}/'> Đề {{ forloop.counter }}</a>
-  	
+  	<input type="button" value="Print" onclick="printTrigger('iFramePdf');" />
+  	<iframe id="iFramePdf" src={{ dt.de_thi.path }} style="display:none;"></iframe>
+  	<br />
   {% empty %}
   <h4>Chưa có đề thi nào</h4>
   {% endfor %} 
   </h3>
 </div>
 {% endblock %}
+
+<script>
+function printTrigger(elementId) 
+{
+    var getMyFrame = document.getElementById(elementId);
+    getMyFrame.focus();
+    getMyFrame.contentWindow.print();
+}
+</script>

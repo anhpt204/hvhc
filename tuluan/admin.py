@@ -9,6 +9,7 @@ from django.contrib.admin.options import TabularInline, ModelAdmin
 from tuluan.models import DeThi, BoDe, CaThi
 from os.path import basename
 from django.contrib import admin
+from copy import deepcopy
 
 class DeThiInline(TabularInline):
     model = DeThi
@@ -58,10 +59,24 @@ class DeThiAdmin(ModelAdmin):
     view_pdf.allow_tags = True
     view_pdf.short_description = 'Xem'
     
+    
+
 class BoDeAdmin(ModelAdmin):
     model = BoDe
     inlines=[DeThiInline]
+    fields=('doi_tuong', 'mon_thi', 'ngay_tao')
     list_display = ['ma_so', 'doi_tuong', 'mon_thi', 'ngay_tao']
+    actions=['create_new_from_old']
+    save_as = True
+    
+    def create_new_from_old(self, request, queryset):
+        for obj in queryset:
+            new_obj = deepcopy(obj)
+            new_obj.id=None
+            
+            new_obj.save()
+            
+    create_new_from_old.short_description="Tạo bộ đề mới từ bộ đề đã có"
     
 
 class CaThiAdmin(ModelAdmin):
