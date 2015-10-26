@@ -10,6 +10,20 @@ import os
 from django.views.generic.detail import DetailView
 import random
 from django.http.response import HttpResponseRedirect
+import PyPDF2
+def print_dt(request, pk):
+    dt = DeThi.objects.get(pk=pk)
+    if dt:
+        file_name = basename(dt.de_thi.path)
+        pdf = open(dt.de_thi.path, 'rb').read()
+#         pdf = PyPDF2.PdfFileReader(open(dt.de_thi.path, 'rb'))
+        response = HttpResponse(pdf, content_type='application/pdf')
+#         response['Content-Disposition'] = 'inline; filename=%s' %(file_name)
+#         return response
+        return response
+    else:
+        return HttpResponse(u'No file')
+    
 def view_pdf(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:

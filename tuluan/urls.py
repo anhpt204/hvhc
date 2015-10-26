@@ -22,5 +22,7 @@ urlpatterns = [
     
     url(r'^get_dt/(?P<pk>[\d]+)/$', CaThiView.as_view(), name='get_dt'),
     url(r'^get_dt/(?P<pk>[\d]+)/sinhde/$', views.sinh_de, name='sinhde'),
+    url(r'^print/(?P<pk>[\d]+)/$', views.print_dt, name='print'),
+    
     
 ]

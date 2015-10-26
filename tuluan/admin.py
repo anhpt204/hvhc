@@ -36,7 +36,7 @@ class DeThiAdmin(ModelAdmin):
         
     def get_de_thi(self, obj):
         if obj.de_thi:
-            return u'<a href="%s">%s</a>' % ('/quiz/tuluan/preview/dethi/'+str(obj.pk)+'/', basename(obj.de_thi.path))
+            return u'<a href="%s">%s</a>' % ('/hvhc/tuluan/preview/dethi/'+str(obj.pk)+'/', basename(obj.de_thi.path))
         else:
             return u'(Chưa có)'
     get_de_thi.allow_tags=True
@@ -44,7 +44,7 @@ class DeThiAdmin(ModelAdmin):
 
     def get_dap_an(self, obj):
         if obj.dap_an:
-            return u'<a href="%s">%s</a>' % ('/quiz/tuluan/preview/dapan/'+str(obj.pk)+'/', basename(obj.dap_an.path))
+            return u'<a href="%s">%s</a>' % ('/hvhc/tuluan/preview/dapan/'+str(obj.pk)+'/', basename(obj.dap_an.path))
         else:
             return u'(Chưa có)'
     get_dap_an.allow_tags=True
@@ -52,7 +52,7 @@ class DeThiAdmin(ModelAdmin):
         
     def view_pdf(self,obj):
         if obj.de_thi:            
-            return u'<a href="%s">View</a>' % ('/quiz/tuluan/preview/'+str(obj.pk)+'/')
+            return u'<a href="%s">View</a>' % ('/hvhc/tuluan/preview/'+str(obj.pk)+'/')
         else:
             return '(no file found)'
         
@@ -88,7 +88,7 @@ class CaThiAdmin(ModelAdmin):
     
     def get_de_thi(self, obj):
         if obj.ds_de_thi    :            
-            return u'<a href="%s">Tạo đề</a>' % ('/quiz/tuluan/get_dt/'+str(obj.pk)+'/')
+            return u'<a href="%s">Tạo đề</a>' % ('/hvhc/tuluan/get_dt/'+str(obj.pk)+'/')
         else:
             return '(no file found)'
         
