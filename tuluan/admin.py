@@ -30,7 +30,7 @@ class DeThiAdmin(ModelAdmin):
 
     def get_mon_thi(self, obj):
         if obj.ngan_hang:
-            return obj.ngan_hang.mon_thi
+            return obj.ngan_hang.monHoc
     get_mon_thi.allow_tags=True
     get_mon_thi.short_description="Môn thi"
         

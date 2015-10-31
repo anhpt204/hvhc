@@ -35,11 +35,11 @@ class BoDe(models.Model):
         verbose_name_plural="Bộ đề thi tự luận"
     
     def __unicode__(self):
-        return u'%s(%s)' %(self.mon_thi, self.doi_tuong)
+        return u'%s(%s)' %(self.monHoc, self.doi_tuong)
     
     
     def save(self, *args, **kwargs):
-        self.ma_so = '%s.%s.%s.%s.%s' %(self.doi_tuong.ma_dt, self.mon_thi.ma_mon_thi,
+        self.ma_so = '%s.%s.%s.%s.%s' %(self.doi_tuong.ma_dt, self.monHoc.ma_mon_thi,
                                         self.ngay_tao.day, self.ngay_tao.month, self.ngay_tao.year)
         
         super(BoDe, self).save(*args, **kwargs)
@@ -115,7 +115,7 @@ class CaThi(models.Model):
         verbose_name_plural = u"Kế hoạch thi - bốc đề"
 
     def __unicode__(self):
-        return u'%s-%s-%s' %(self.doi_tuong, self.mon_thi, self.lop)
+        return u'%s-%s-%s' %(self.doi_tuong, self.monHoc, self.lop)
     
     @property
     def da_thi(self):

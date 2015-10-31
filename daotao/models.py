@@ -34,6 +34,7 @@ class DoiTuong(models.Model):
 class MonThi(models.Model):
     ma_mon_thi = CharField(verbose_name = "Mã môn thi", unique = True, max_length=10)
     ten_mon_thi = CharField(verbose_name = "Môn thi", unique=True,max_length=200) 
+    so_chuong = PositiveIntegerField(verbose_name="Số chương", default=5)
     
     class Meta:
         verbose_name = "Môn thi"

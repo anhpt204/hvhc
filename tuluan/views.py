@@ -10,7 +10,8 @@ import os
 from django.views.generic.detail import DetailView
 import random
 from django.http.response import HttpResponseRedirect
-import PyPDF2
+
+
 def print_dt(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
@@ -67,7 +68,7 @@ class CaThiView(DetailView):
         context = DetailView.get_context_data(self, **kwargs)
         # lay ngan hang de thi tuong ung voi doi_tuong va mon_thi
         ngan_hang = BoDe.objects.filter(doi_tuong=self.object.doi_tuong, 
-                                                        mon_thi=self.object.mon_thi)
+                                                        mon_thi=self.object.monHoc)
 
         context['ds_bo_de'] = ngan_hang
          

@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 from django.db import models
+from django.contrib.auth.models import User
+
 from django.db.models.fields import CharField, TextField, DateField, TimeField,\
     CommaSeparatedIntegerField, BooleanField, PositiveIntegerField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
@@ -9,7 +11,7 @@ from random import sample
 from hvhc import MCQUESTION, TFQUESTION, QUESTION_TYPES, ANSWER_ORDER_OPTIONS,\
     ESSAYQUESTION
 import json
-from daotao.models import Lop, MonThi
+from daotao.models import Lop, MonThi, DoiTuong
 
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
@@ -50,7 +52,7 @@ class CaThi(models.Model):
     title = CharField(verbose_name="Ca thi", max_length=200, blank=False)
     
     description=TextField(verbose_name="Ghi chú", blank=True, null=True)
-    mon_thi = ForeignKey(MonThi, blank=False, null=False,
+    monHoc = ForeignKey(MonThi, blank=False, null=False,
                          related_name='%(class)s_monthi_cathi',
                          verbose_name="Môn thi")
 #     lop_thi = ForeignKey(Lop, blank=False, null=False,
@@ -116,9 +118,9 @@ class CaThi(models.Model):
         questions = []
         for cathi_setting in questionGroup_settings:
             # lay cau hoi theo nhom va loai (type)
-            qs = Question.objects.filter(mon_thi=self.mon_thi,
-                                    question_type = cathi_setting.question_type,
-                                    question_group = cathi_setting.question_group)
+            qs = Question.objects.filter(mon_thi=self.monHoc,
+                                    question_type = cathi_setting.loaiCauHoi,
+                                    question_group = cathi_setting.level)
             # lay id
             q_ids = qs.values_list('id', flat=True)
             # lay ngau nhien so cau hoi
@@ -152,7 +154,7 @@ class CaThi(models.Model):
                 q = Question.objects.get(id=cauhoi_id)
                 # neu cau hoi la multichoice question thi hoan doi thu tu
                 # cau tra loi
-                if q.question_type == MCQUESTION:
+                if q.loaiCauHoi == MCQUESTION:
                     # lay cac cau tra loi cua cau hoi nay
 #                     q = (MCQuestion)q
                      
@@ -169,7 +171,7 @@ class CaThi(models.Model):
                     # add vao mot dictionary
                     ds_cauhoi_answer.append((cauhoi_id, answer_ids))
                  
-                elif q.question_type == TFQUESTION:
+                elif q.loaiCauHoi == TFQUESTION:
                     ds_cauhoi_answer.append((cauhoi_id, [1, 0]))
                  
                 else:
@@ -181,10 +183,10 @@ class CaThi(models.Model):
 class QuestionGroup_Setting(models.Model):
     ca_thi = ForeignKey(CaThi, verbose_name="Ca thi")
     
-    question_group = ForeignKey(QuestionGroup, 
+    level = ForeignKey(QuestionGroup, 
                                 verbose_name="Nhóm câu hỏi")
     
-    question_type = CharField(max_length=5,
+    loaiCauHoi = CharField(max_length=5,
                             choices=QUESTION_TYPES,
                             default=MCQUESTION,
                             verbose_name="Loại câu hỏi")
@@ -200,7 +202,7 @@ class QuestionGroup_Setting(models.Model):
 #         managed=False
         
     def __unicode__(self):
-        return u'%s:%s:%s' %(self.question_group.name,
+        return u'%s:%s:%s' %(self.level.name,
                              self.num_of_questions,
                              self.mark_per_question)
 
@@ -228,53 +230,60 @@ class Question(models.Model):
     base class for all other type of questions
     shared all properties
     '''
-    ca_thi = ManyToManyField(CaThi, 
-                        blank=True,
-                        verbose_name="Ca thi")
-    mon_thi = ForeignKey(MonThi,
+    monHoc = ForeignKey(MonThi,
                          blank=False, null=False,
                          verbose_name="Môn thi")
-    question_group = ForeignKey(QuestionGroup,
-                                blank=False, null=False,
-                                verbose_name="Nhóm câu hỏi")
-    question_type = CharField(max_length=5,
+    doiTuong = ForeignKey(DoiTuong, 
+                          verbose_name="Đối tượng")
+    loaiCauHoi = CharField(max_length=5,
                               choices=QUESTION_TYPES,
                             default=MCQUESTION,
                             verbose_name="Loại câu hỏi")
+    taoBoi = ForeignKey(GiaoVien,
+                        verbose_name="Người tạo")
     
-    chapter = PositiveIntegerField(verbose_name="Chương", default=1)
+    prior = ForeignKey(QuestionGroup,
+                       verbose_name="Nhóm câu hỏi",
+                       related_name='prior_knowledge')
     
-    figure = models.ImageField(upload_to='uploads/%Y/%m/%d',
+    level = PositiveIntegerField(default=1)
+    
+    thuocChuong = CommaSeparatedIntegerField(max_length=50,
+                                             verbose_name="Thuộc các chương",
+                                             default=1)
+
+    noiDung = models.TextField(max_length=1000,
+                               blank=False,
+                               verbose_name='Câu hỏi')
+        
+    figure = models.ImageField(upload_to='uploads/figs/%Y/%m/%d',
                                blank=True,
                                null=True,
                                verbose_name=("Ảnh"))
 
-    content = models.TextField(max_length=1000,
-                               blank=False,
-                               verbose_name='Câu hỏi')
+    audio = models.ImageField(upload_to='uploads/audios/%Y/%m/%d',
+                               blank=True,
+                               null=True,
+                               verbose_name=("Ảnh"))
 
-#     explanation = models.TextField(max_length=2000,
-#                                    blank=True,
-#                                    help_text=_("Explanation to be shown "
-#                                                "after the question has "
-#                                                "been answered."),
-#                                    verbose_name=_('Explanation'))
-
-#     objects = InheritanceManager()
+    clip = models.ImageField(upload_to='uploads/clips/%Y/%m/%d',
+                               blank=True,
+                               null=True,
+                               verbose_name=("Ảnh"))
     
     class Meta:
         verbose_name = "Câu hỏi"
         verbose_name_plural = "Danh sách câu hỏi"
     
     def __unicode__(self):
-        return u'%s' %(self.content)
+        return u'%s' %(self.noiDung)
     
     def getAnswers(self):
         pass
 
 
 class MCQuestion(Question):
-    answer_order = CharField(
+    answerOrder = CharField(
         max_length=30, null=True    , blank=True,
         choices=ANSWER_ORDER_OPTIONS,
 #         help_text=_("The order in which multichoice "
@@ -283,7 +292,7 @@ class MCQuestion(Question):
         verbose_name="Thứ tự hiển thị câu trả lời")
     
     def save(self, *args, **kwargs):
-        self.question_type = MCQUESTION
+        self.loaiCauHoi = MCQUESTION
         super(MCQuestion, self).save(*args, **kwargs)
         
     class Meta:
@@ -296,49 +305,49 @@ class MCQuestion(Question):
 class Answer(models.Model):
     question = ForeignKey(MCQuestion, verbose_name="Câu hỏi")
 
-    content = CharField(max_length=1000,
+    dapAn = CharField(max_length=1000,
                                blank=False,
 #                                help_text=_("Enter the answer text that "
 #                                            "you want displayed"),
                                verbose_name="Phương án trả lời")
 
-    is_correct = BooleanField(blank=False,
+    isCorrect = BooleanField(blank=False,
                                   default=False,
                                   help_text="Phương án đúng?",
                                   verbose_name="Là phương án đúng")
 
     def __unicode__(self):
-        return u'%s' %(self.content)
+        return u'%s' %(self.dapAn)
 
     class Meta:
         verbose_name = "Phương án trả lời"
         verbose_name_plural = "Danh sách phương án trả lời"
 
-class EssayQuestion(Question):
-    answer = TextField(blank=False, null=False,
-                       verbose_name="Trả lời")
-    
-    def save(self, *args, **kwargs):
-        self.question_type = ESSAYQUESTION
-        super(EssayQuestion, self).save(*args, **kwargs)
-        
-    class Meta:
-        verbose_name = "Câu hỏi tự luận"
-        verbose_name_plural = "Danh sách câu hỏi tự luận"
+# class EssayQuestion(Question):
+#     answer = TextField(blank=False, null=False,
+#                        verbose_name="Trả lời")
+#     
+#     def save(self, *args, **kwargs):
+#         self.loaiCauHoi = ESSAYQUESTION
+#         super(EssayQuestion, self).save(*args, **kwargs)
+#         
+#     class Meta:
+#         verbose_name = "Câu hỏi tự luận"
+#         verbose_name_plural = "Danh sách câu hỏi tự luận"
         
 class TFQuestion(Question):
-    is_correct = BooleanField(blank=False,
+    isTrue = BooleanField(blank=False,
                                   default=False,
                                   verbose_name="Là đáp án đúng?")
     
     def save(self, *args, **kwargs):
-        self.question_type = TFQUESTION
+        self.loaiCauHoi = TFQUESTION
         super(TFQuestion, self).save(*args, **kwargs)
         
     class Meta:
         verbose_name = "Câu hỏi Đúng/Sai"
         verbose_name_plural = "Danh sách câu hỏi Đúng/Sai"
-        ordering = ['mon_thi']
+        ordering = ['monHoc']
         
         
 class DeThi(models.Model):
@@ -379,9 +388,9 @@ class DeThi(models.Model):
             q = Question.objects.get(id=cau_hoi[0])
 
             # get cau tra loi            
-            if q.question_type == ESSAYQUESTION:
+            if q.loaiCauHoi == ESSAYQUESTION:
                 questions.append((q, []))
-            elif q.question_type == TFQUESTION:
+            elif q.loaiCauHoi == TFQUESTION:
                 questions.append((q,[True, False]))
             else:
                 # get mc answers
@@ -389,3 +398,70 @@ class DeThi(models.Model):
                 questions.append((q, answers))
                 
         return questions
+
+class LogSinhDe(models.Model):
+    monHoc = ForeignKey(MonThi,
+                        verbose_name="Môn thi")
+    doiTuong = ForeignKey(DoiTuong,
+                          verbose_name="Đối tượng")
+    soLuong = PositiveIntegerField(verbose_name="Số lượng", 
+                                   default=20)
+    ngayTao = DateField(verbose_name="Ngày tạo")
+    
+    nguoiTao = ForeignKey(User, verbose_name="Người tạo")
+    
+    class Meta:
+        verbose_name="Sinh đề thi"
+        verbose_name_plural="Sinh đề thi"
+        
+    def __unicode__(self):
+        return u"sinh %d đề cho môn %s, đối tượng %s" %(self.soLuong, self.monHoc, self.doiTuong)
+    
+    def sinhDe(self):
+        '''
+        sinh so luong de thi theo yeu cau cho mon thi va doi tuong da chon.
+        De sinh ra phai theo cau hinh va phu noi dung chuong trinh
+        '''
+        pass
+    
+class SinhDeConf(models.Model):
+    logSinhDe = ForeignKey(LogSinhDe)
+    level = ForeignKey(QuestionGroup, 
+                                verbose_name="Nhóm câu hỏi")
+    
+    loaiCauHoi = CharField(max_length=5,
+                            choices=QUESTION_TYPES,
+                            default=MCQUESTION,
+                            verbose_name="Loại câu hỏi")
+    
+    soLuong = PositiveIntegerField(verbose_name="số câu hỏi",
+                                            default=1)
+    
+    class Meta:
+        verbose_name = "Cấu hình ca thi"
+        verbose_name_plural = "Cấu hình ca thi"
+#         managed=False
+        
+    def __unicode__(self):
+        return u'%s:%s' %(self.level.name,
+                             self.soLuong)
+    
+class NganHangDe(models.Model):
+    questions = CommaSeparatedIntegerField(max_length=50,
+                                           verbose_name = "Danh sách câu hỏi",
+                                           default=1)
+    logSinhDe = ForeignKey(LogSinhDe)
+    
+    daDuyet = BooleanField(verbose_name="Đã duyệt",
+                           default=False)
+    
+    class Meta:
+        verbose_name="Ngân hàng đề thi"
+        verbose_name_plural="Ngân hàng đề thi"
+        
+    def bocVaTronDe(self, idMonHoc, idDoiTuong, soLuong):
+        '''
+        Boc de thi trong ngan hang de theo mon hoc va doi tuong.
+        Sau khi co de thi, tien hanh tron de thi thanh (soLuong) de
+        '''
+        pass

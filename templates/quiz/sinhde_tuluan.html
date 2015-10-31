@@ -43,14 +43,11 @@ Sinh đề thi tự luận
 
 <h3>Các đề đã được sinh ra: <br />
   {% for dt in object.ds_de_thi.all %}
-    {{ dt.de_thi.url }}
   	<a href='/hvhc/tuluan/preview/dethi/{{ dt.pk }}/'> Đề {{ forloop.counter }}</a>
-  	<input type="button" value="Print" onClick="print1('iFramePdf');" />
+<!--  	<input type="button" value="Print" onClick="print1('iFramePdf');" />
 
-<!-- 	<iframe id="iFramePdf" src="{% url 'print' dt.pk %}" style="display:none;"></iframe>
- -->
  	<iframe id="iFramePdf" src="{% url 'print' dt.pk %}" style="display:none;"></iframe>
-  	
+ -->  	
   	<br />
   {% empty %}
   <h4>Chưa có đề thi nào</h4>
