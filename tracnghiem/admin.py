@@ -63,9 +63,14 @@ class MCQuestionAdmin(ModelAdmin):
     
 class LogSinhDeAdmin(ModelAdmin):
     model = LogSinhDe
-    
+    fields = ("monHoc", 'doiTuong', 'soLuong', 'ngayTao')
     list_display=("monHoc", 'doiTuong', 'ngayTao', 'nguoiTao', 'soLuong', 'sinhDe')
     inlines=[SinhDeConfInline]
+    
+    def save_model(self, request, obj, form, change):
+        instance = form.save(commit=False)
+        instance.nguoiTao = request.user
+        instance.save()
     
     def sinhDe(self, obj):
         ds_dethi = obj.sinhDe()

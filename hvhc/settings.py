@@ -91,7 +91,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'vi'
 
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
@@ -117,3 +117,8 @@ STATICFILES_DIRS = (
 )
 
 ADMIN_MEDIA_PREFIX='/static/'
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+    '/var/www/locale',
+)

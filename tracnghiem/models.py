@@ -416,7 +416,7 @@ class LogSinhDe(models.Model):
         
     def __unicode__(self):
         return u"sinh %d đề cho môn %s, đối tượng %s" %(self.soLuong, self.monHoc, self.doiTuong)
-    
+        
     def sinhDe(self):
         '''
         sinh so luong de thi theo yeu cau cho mon thi va doi tuong da chon.
