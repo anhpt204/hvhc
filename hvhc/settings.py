@@ -96,6 +96,7 @@ LANGUAGE_CODE = 'vi'
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
+Q = 100
 
 USE_L10N = True
 

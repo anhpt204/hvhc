@@ -13,6 +13,8 @@ from django.utils import timezone
 from hvhc import HOC_KY, HK1
 from hrm.models import GiaoVien
 from datetime import date
+from hvhc.settings import *
+from django.http.response import HttpResponse
 
 class BoDe(models.Model):
     '''
@@ -35,11 +37,11 @@ class BoDe(models.Model):
         verbose_name_plural="Bộ đề thi tự luận"
     
     def __unicode__(self):
-        return u'%s(%s)' %(self.monHoc, self.doi_tuong)
+        return u'%s(%s)' %(self.mon_thi, self.doi_tuong)
     
     
     def save(self, *args, **kwargs):
-        self.ma_so = '%s.%s.%s.%s.%s' %(self.doi_tuong.ma_dt, self.monHoc.ma_mon_thi,
+        self.ma_so = '%s.%s.%s.%s.%s' %(self.doi_tuong.ma_dt, self.mon_thi.ma_mon_thi,
                                         self.ngay_tao.day, self.ngay_tao.month, self.ngay_tao.year)
         
         super(BoDe, self).save(*args, **kwargs)
@@ -73,7 +75,10 @@ class DeThi(models.Model):
     def __unicode__(self):
         return u'%s (%s)' %(self.ma_de_thi, self.ngan_hang)
     
-        
+    def save(self, force_insert=False, force_update=False, using=None, 
+        update_fields=None):        
+        if DeThi.objects.count() < Q:
+            return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)        
 class CaThi(models.Model):
     ten_ca_thi = CharField(max_length=100,
                            verbose_name="Tên ca thi")
