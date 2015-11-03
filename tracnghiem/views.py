@@ -9,7 +9,7 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_protect
 
 from datetime import datetime
-from tracnghiem.models import CaThi, DeThi
+from tracnghiem.models import CaThi, DeThi, LogSinhDe
 import json
 from django.views.generic.detail import DetailView
 
@@ -88,3 +88,10 @@ class DethiStartView(DetailView):
         context['questions'] = self.object.get_ds_cau_hoi()
         
         return context
+    
+def sinhde(request, pk):
+    logSinhDe = LogSinhDe.objects.get(pk=pk)
+    ok, msg = logSinhDe.sinhDe()
+    
+    # if ok then render to a new page that list all generated dethi
+    return HttpResponse(msg)

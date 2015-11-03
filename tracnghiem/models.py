@@ -12,6 +12,7 @@ from hvhc import MCQUESTION, TFQUESTION, QUESTION_TYPES, ANSWER_ORDER_OPTIONS,\
     ESSAYQUESTION
 import json
 from daotao.models import Lop, MonThi, DoiTuong
+import random
 
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
@@ -423,7 +424,31 @@ class LogSinhDe(models.Model):
         De sinh ra phai theo cau hinh va phu noi dung chuong trinh. Cac de sinh ra
         duoc luu vao NganHangDe
         '''
-        pass
+        configs = self.sinhdeconf_set.all()
+        message = 'Successful'
+        # sinh tung de thi
+        for _ in xrange(self.soLuong):
+            ds_cauhoi = []
+            # lay cau hoi cho tung cau hinh
+            for config in configs:
+                # get all question that satisfy this config
+                qs = Question.objects.filter(prior=config.level).filter(loaiCauHoi=config.loaiCauHoi)
+                # randomly select a number of question
+                if len(qs) < config.soLuong:
+#                     message = u"Số lượng câu hỏi môn %s loại %s cấp độ %d không đủ %d như cấu hình sinh đề!" %(self.monHoc, config.loaiCauHoi, config.level, config.soLuong)
+                    message=u'Số lượng câu hỏi chưa đủ'
+                    return False, message
+                
+                else:
+                    ds_cauhoi += random.sample(qs, config.soLuong)
+                    
+            # make new NganHangDe and add these questions in to 
+            nh = NganHangDe()
+            nh.logSinhDe = self
+            nh.daDuyet = False
+            nh.questions = ','.join([str(q.pk) for q in ds_cauhoi])
+            nh.save()
+        
     
 class SinhDeConf(models.Model):
     logSinhDe = ForeignKey(LogSinhDe)

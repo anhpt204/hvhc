@@ -49,7 +49,7 @@ class QuestionGroupAdmin(ModelAdmin):
 class MCQuestionAdmin(ModelAdmin):
     model=MCQuestion
     
-    list_display = ('id', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong')
+    list_display = ('id', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong', 'prior', 'level')
     list_filter = ('monHoc', 'doiTuong')
     fields = ('monHoc', 'doiTuong', 
               'prior', 'thuocChuong', 'taoBoi',
