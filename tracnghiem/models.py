@@ -249,7 +249,7 @@ class Question(models.Model):
     level = PositiveIntegerField(default=1)
     
     thuocChuong = CommaSeparatedIntegerField(max_length=50,
-                                             verbose_name="Thuộc các chương",
+                                             verbose_name="Phủ các chương",
                                              default=1)
 
     noiDung = models.TextField(max_length=1000,
@@ -420,7 +420,8 @@ class LogSinhDe(models.Model):
     def sinhDe(self):
         '''
         sinh so luong de thi theo yeu cau cho mon thi va doi tuong da chon.
-        De sinh ra phai theo cau hinh va phu noi dung chuong trinh
+        De sinh ra phai theo cau hinh va phu noi dung chuong trinh. Cac de sinh ra
+        duoc luu vao NganHangDe
         '''
         pass
     

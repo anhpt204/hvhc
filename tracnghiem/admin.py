@@ -49,7 +49,7 @@ class QuestionGroupAdmin(ModelAdmin):
 class MCQuestionAdmin(ModelAdmin):
     model=MCQuestion
     
-    list_display = ('id', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi' )
+    list_display = ('id', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong')
     list_filter = ('monHoc', 'doiTuong')
     fields = ('monHoc', 'doiTuong', 
               'prior', 'thuocChuong', 'taoBoi',
@@ -64,8 +64,14 @@ class MCQuestionAdmin(ModelAdmin):
 class LogSinhDeAdmin(ModelAdmin):
     model = LogSinhDe
     
+    list_display=("monHoc", 'doiTuong', 'ngayTao', 'nguoiTao', 'soLuong', 'sinhDe')
     inlines=[SinhDeConfInline]
     
+    def sinhDe(self, obj):
+        ds_dethi = obj.sinhDe()
+        return u'<a href="%s">Sinh đề</a>' % ('/hvhc/tracnghiem/sinhde/'+str(obj.pk)+'/')
+    sinhDe.allow_tags=True
+    sinhDe.short_description="Sinh đề"
     
 class TFQuestionAdmin(ModelAdmin    ):
     model = TFQuestion
