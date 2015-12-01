@@ -41,7 +41,7 @@ class MonThi(models.Model):
         verbose_name_plural = "Danh sách môn thi"
         
     def __unicode__(self):
-        return u'%s' %(self.ten_mon_thi)
+        return u'%s (%d)' %(self.ten_mon_thi, self.so_chuong)
      
 # @python_2_unicode_compatible
 class Lop(models.Model):

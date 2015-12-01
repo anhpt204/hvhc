@@ -51,7 +51,7 @@ def view_dapan(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
         file_name = basename(dt.dap_an.path)
-        os.stat(dt.dap_an.path, 'print')
+#         os.stat(dt.dap_an.path, 'print')
         pdf = open(dt.dap_an.path, 'r').read()
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename=%s' %(file_name)

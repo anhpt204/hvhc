@@ -262,16 +262,16 @@ class Question(models.Model):
                                null=True,
                                verbose_name=("Ảnh"))
 
-    audio = models.ImageField(upload_to='uploads/audios/%Y/%m/%d',
-                               blank=True,
-                               null=True,
-                               verbose_name=("Ảnh"))
-
-    clip = models.ImageField(upload_to='uploads/clips/%Y/%m/%d',
-                               blank=True,
-                               null=True,
-                               verbose_name=("Ảnh"))
-    
+#     audio = models.ImageField(upload_to='uploads/audios/%Y/%m/%d',
+#                                blank=True,
+#                                null=True,
+#                                verbose_name=("Audio"))
+# 
+#     clip = models.ImageField(upload_to='uploads/clips/%Y/%m/%d',
+#                                blank=True,
+#                                null=True,
+#                                verbose_name=("Clips"))
+#     
     class Meta:
         verbose_name = "Câu hỏi"
         verbose_name_plural = "Danh sách câu hỏi"
@@ -432,7 +432,7 @@ class LogSinhDe(models.Model):
             # lay cau hoi cho tung cau hinh
             for config in configs:
                 # get all question that satisfy this config
-                qs = Question.objects.filter(prior=config.level).filter(loaiCauHoi=config.loaiCauHoi)
+                qs = Question.objects.filter(monHoc=self.monHoc).filter(doiTuong=self.doiTuong).filter(prior=config.level).filter(loaiCauHoi=config.loaiCauHoi)
                 # randomly select a number of question
                 if len(qs) < config.soLuong:
 #                     message = u"Số lượng câu hỏi môn %s loại %s cấp độ %d không đủ %d như cấu hình sinh đề!" %(self.monHoc, config.loaiCauHoi, config.level, config.soLuong)
@@ -448,7 +448,9 @@ class LogSinhDe(models.Model):
             nh.daDuyet = False
             nh.questions = ','.join([str(q.pk) for q in ds_cauhoi])
             nh.save()
-        
+            nh.maDeThi = "%s%d" %(self.monHoc.ma_mon_thi, nh.pk)
+            nh.save()
+        return True, message
     
 class SinhDeConf(models.Model):
     logSinhDe = ForeignKey(LogSinhDe)
@@ -473,6 +475,8 @@ class SinhDeConf(models.Model):
                              self.soLuong)
     
 class NganHangDe(models.Model):
+    maDeThi = CharField(max_length=10, blank=True, null=True,
+                        verbose_name="Mã đề thi")
     questions = CommaSeparatedIntegerField(max_length=50,
                                            verbose_name = "Danh sách câu hỏi",
                                            default=1)
@@ -480,6 +484,8 @@ class NganHangDe(models.Model):
     
     daDuyet = BooleanField(verbose_name="Đã duyệt",
                            default=False)
+    
+    ngay_tao = DateField(verbose_name="Ngày tạo")
     
     class Meta:
         verbose_name="Ngân hàng đề thi"

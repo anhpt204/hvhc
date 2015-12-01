@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from django.conf.global_settings import MEDIA_ROOT, MEDIA_URL
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -123,3 +124,6 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
     '/var/www/locale',
 )
+
+MEDIA_ROOT= '/home/pta/git/hvhc/media/'
+MEDIA_URL = '/media/'
