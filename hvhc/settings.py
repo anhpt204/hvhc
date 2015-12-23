@@ -15,7 +15,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
+#FILE_UPLOAD_PERMISSIONS = 0644
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+#	'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +41,7 @@ INSTALLED_APPS = (
 
     'daotao',
     'hrm',
-    'tracnghiem',
+#    'tracnghiem',
     'tuluan',
 )
 
@@ -60,8 +61,8 @@ ROOT_URLCONF = 'hvhc.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/home/pta/git/hvhc/templates',
-                 '/home/pta/git/hvhc/templates/quiz/'],
+        'DIRS': ['/var/www/hvhc/templates',
+                 '/var/www/hvhc/templates/quiz/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -109,17 +110,23 @@ TIME_INPUT_FORMATS=("%H:%M",)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
+STATIC_ROOT = '/var/www/hvhc/static/'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-    '/var/www/static/',
+#    os.path.join(BASE_DIR, "static"),
+#    '/var/www/hvhc/static/',
+	'/var/www/hvhc/media',
+	'/var/www/hvhc/locate',
 )
 
-ADMIN_MEDIA_PREFIX='/static/'
+ADMIN_MEDIA_PREFIX='/static/admin/'
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
     '/var/www/locale',
 )
+MEDIA_ROOT='/var/www/hvhc/media'
+MEDIA_URL='/media/'
+
+DAB_FIELD_RENDERER = 'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'

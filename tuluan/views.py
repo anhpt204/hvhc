@@ -4,12 +4,13 @@ Created on Sep 18, 2015
 @author: pta
 '''
 from tuluan.models import DeThi, CaThi, BoDe
-from os.path import basename
+from os.path import basename, join
 from django.http import HttpResponse
 import os
 from django.views.generic.detail import DetailView
 import random
 from django.http.response import HttpResponseRedirect
+from hvhc.settings import BASE_DIR
 
 
 def print_dt(request, pk):
@@ -40,7 +41,7 @@ def view_dethi(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
         file_name = basename(dt.de_thi.path)
-        pdf = open(dt.de_thi.path, 'r').read()
+        pdf = open(join(BASE_DIR, dt.de_thi.path), 'r').read()
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename=%s' %(file_name)
         return response
@@ -51,8 +52,8 @@ def view_dapan(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
         file_name = basename(dt.dap_an.path)
-        os.stat(dt.dap_an.path, 'print')
-        pdf = open(dt.dap_an.path, 'r').read()
+#        os.stat(dt.dap_an.path, 'print')
+        pdf = open(join(BASE_DIR, dt.dap_an.path), 'r').read()
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename=%s' %(file_name)
         return response
@@ -68,7 +69,7 @@ class CaThiView(DetailView):
         context = DetailView.get_context_data(self, **kwargs)
         # lay ngan hang de thi tuong ung voi doi_tuong va mon_thi
         ngan_hang = BoDe.objects.filter(doi_tuong=self.object.doi_tuong, 
-                                                        mon_thi=self.object.monHoc)
+                                                        mon_thi=self.object.mon_thi)
 
         context['ds_bo_de'] = ngan_hang
          
@@ -132,5 +133,5 @@ def sinh_de(request, pk):
             
         cathi_tuluan.save()
         
-        return HttpResponseRedirect('/quiz/tuluan/get_dt/%s/' %(pk))
+        return HttpResponseRedirect('/hvhc/tuluan/get_dt/%s/' %(pk))
 
