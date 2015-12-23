@@ -2,7 +2,8 @@
 
 from django.contrib.admin.options import TabularInline, ModelAdmin
 from tracnghiem.models import Answer, QuestionGroup_Setting, Chapter_Setting,\
-    CaThi, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe
+    CaThi, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
+    NganHangDe
 
 from django.contrib import admin
 
@@ -53,7 +54,7 @@ class MCQuestionAdmin(ModelAdmin):
     list_filter = ('monHoc', 'doiTuong')
     fields = ('monHoc', 'doiTuong', 
               'prior', 'thuocChuong', 'taoBoi',
-              'noiDung', 'figure', 'audio', 'clip'  )
+              'noiDung', 'figure', )#'audio', 'clip'  )
 
     search_fields = ('noiDung',)
 #     filter_horizontal = ('ca_thi',)
@@ -73,18 +74,41 @@ class LogSinhDeAdmin(ModelAdmin):
         instance.save()
     
     def sinhDe(self, obj):
-        ds_dethi = obj.sinhDe()
+#         ds_dethi = obj.sinhDe()
         return u'<a href="%s">Sinh đề</a>' % ('/hvhc/tracnghiem/sinhde/'+str(obj.pk)+'/')
     sinhDe.allow_tags=True
     sinhDe.short_description="Sinh đề"
     
-class TFQuestionAdmin(ModelAdmin    ):
+class TFQuestionAdmin(ModelAdmin):
     model = TFQuestion
     list_display = ('monHoc', 'doiTuong', 'noiDung', 'taoBoi')
     fields = ('monHoc', 'doiTuong', 'prior', 'thuocChuong', 'taoBoi',
               'noiDung', 'figure', 'audio', 'clip', 'isTrue' )
     list_filter = ('monHoc',)
     
+class NganHangDeAdmin(ModelAdmin):
+    model=NganHangDe
+    list_display=('maDeThi', 'get_monHoc', 'get_doiTuong', 'ngay_tao', 'daDuyet')
+    
+    list_filter=('logSinhDe__doiTuong', 'logSinhDe__monHoc', 'ngay_tao', 'daDuyet')
+    actions=['duyet_deThi', 'boDuyet_deThi']
+    
+    
+    def get_monHoc(self, obj):
+        return obj.logSinhDe.monHoc
+    get_monHoc.short_description="Môn thi"
+
+    def get_doiTuong(self, obj):
+        return obj.logSinhDe.doiTuong
+    get_doiTuong.short_description="Đối tượng"
+
+    def duyet_deThi(self, request, queryset):
+        queryset.update(daDuyet=True)
+    duyet_deThi.short_description = "Duyệt các đề đã chọn"
+    
+    def boDuyet_deThi(self, request, queryset):
+        queryset.update(daDuyet=False)
+    boDuyet_deThi.short_description = "Bỏ duyệt các đề đã chọn"
     
 # class EssayQuestionAdmin(ModelAdmin):
 #     list_display=('mon_thi', 'content',)
@@ -93,7 +117,7 @@ class TFQuestionAdmin(ModelAdmin    ):
 #               'figure', 'question_group', 'answer' )
     
 admin.site.register(LogSinhDe, LogSinhDeAdmin)
-# admin.site.register(CaThi, CaThiAdmin)
+admin.site.register(NganHangDe, NganHangDeAdmin)
 admin.site.register(QuestionGroup, QuestionGroupAdmin)
 admin.site.register(MCQuestion, MCQuestionAdmin)
 admin.site.register(TFQuestion, TFQuestionAdmin)

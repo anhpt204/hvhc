@@ -8,7 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2015-11-18 14:50+0700\n"
+=======
+"POT-Creation-Date: 2015-11-03 23:37+0700\n"
+>>>>>>> 4e0a61cfd19b7144bb4fb6e2bc4fdebdff04d78c
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +22,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+<<<<<<< HEAD
 msgid "Django administration"
 msgstr ""
 #: env/lib/python2.7/site-packages/django/contrib/messages/apps.py:7
@@ -1107,3 +1112,25 @@ msgstr ""
 #: templates/base.html:9
 msgid "Hệ thống thi trắc nghiệm - HVHC"
 msgstr ""
+=======
+msgid "Site administration"
+msgstr "Hệ thống quản lý đề thi và tổ chức thi"
+
+msgid "Django administration"
+msgstr "Quản trị hệ thống"
+
+msgid "Add"
+msgstr "Thêm mới"
+
+msgid "Go"
+msgstr "Thực thi"
+
+msgid "Run the selected action"
+msgstr "Thực thi hành động đã chọn"
+
+msgid "Action:"
+msgstr "Hành động:"
+
+
+
+>>>>>>> 4e0a61cfd19b7144bb4fb6e2bc4fdebdff04d78c
