@@ -120,7 +120,7 @@ class CaThi(models.Model):
         verbose_name_plural = u"Kế hoạch thi - bốc đề"
 
     def __unicode__(self):
-        return u'%s-%s-%s' %(self.doi_tuong, self.monHoc, self.lop)
+        return u'%s-%s-%s' %(self.doi_tuong, self.mon_thi, self.lop)
     
     @property
     def da_thi(self):
