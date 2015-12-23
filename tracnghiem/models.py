@@ -13,6 +13,7 @@ from hvhc import MCQUESTION, TFQUESTION, QUESTION_TYPES, ANSWER_ORDER_OPTIONS,\
 import json
 from daotao.models import Lop, MonThi, DoiTuong
 import random
+from django.utils import timezone
 
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
@@ -231,6 +232,8 @@ class Question(models.Model):
     base class for all other type of questions
     shared all properties
     '''
+    maCauHoi = CharField(max_length=20, verbose_name="Mã câu hỏi")
+    
     monHoc = ForeignKey(MonThi,
                          blank=False, null=False,
                          verbose_name="Môn thi")
@@ -446,6 +449,7 @@ class LogSinhDe(models.Model):
             nh = NganHangDe()
             nh.logSinhDe = self
             nh.daDuyet = False
+            nh.ngay_tao = timezone.now()
             nh.questions = ','.join([str(q.pk) for q in ds_cauhoi])
             nh.save()
             nh.maDeThi = "%s%d" %(self.monHoc.ma_mon_thi, nh.pk)

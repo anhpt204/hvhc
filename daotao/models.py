@@ -12,7 +12,9 @@ from django.db.models.fields import CharField, CommaSeparatedIntegerField, Posit
 # from hvhc import TRANG_THAI_THI
 # import hvhc
 from hvhc import TRANG_THAI_THI
+# from hrm.models import DonVi
 # from hrm.models import SinhVien
+# import hrm
 
 class DoiTuong(models.Model):
     ma_dt = CharField(unique=True, max_length=10,
@@ -34,6 +36,7 @@ class DoiTuong(models.Model):
 class MonThi(models.Model):
     ma_mon_thi = CharField(verbose_name = "Mã môn thi", unique = True, max_length=10)
     ten_mon_thi = CharField(verbose_name = "Môn thi", unique=True,max_length=200) 
+#     don_vi = ForeignKey(hrm.DonVi, verbose_name="Đơn vị")
     so_chuong = PositiveIntegerField(verbose_name="Số chương", default=5)
     
     class Meta:

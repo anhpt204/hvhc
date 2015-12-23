@@ -50,9 +50,9 @@ class QuestionGroupAdmin(ModelAdmin):
 class MCQuestionAdmin(ModelAdmin):
     model=MCQuestion
     
-    list_display = ('id', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong', 'prior', 'level')
+    list_display = ('maCauHoi', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong', 'prior', 'level')
     list_filter = ('monHoc', 'doiTuong')
-    fields = ('monHoc', 'doiTuong', 
+    fields = ('maCauHoi', 'monHoc', 'doiTuong', 
               'prior', 'thuocChuong', 'taoBoi',
               'noiDung', 'figure', )#'audio', 'clip'  )
 
