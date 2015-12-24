@@ -11,6 +11,7 @@ encoding//hvhc/__init__.py=utf-8
 encoding//tracnghiem/admin.py=utf-8
 encoding//tracnghiem/apps.py=utf-8
 encoding//tracnghiem/models.py=utf-8
+encoding//tracnghiem/util.py=utf-8
 encoding//tuluan/admin.py=utf-8
 encoding//tuluan/apps.py=utf-8
 encoding//tuluan/models.py=utf-8

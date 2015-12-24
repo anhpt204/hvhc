@@ -1,0 +1,24 @@
+lines = open('/home/pta/git/hvhc/k8.csv').readlines()
+from tracnghiem.models import *
+for line in lines:
+    q = MCQuestion()
+    vs = line.split('\t')
+    q.doiTuong_id = 2
+    q.level = 1
+    q.monHoc_id = 2
+    q.prior_id = 1
+    q.taoBoi_id = 1
+    q.loaiCauHoi = 'MC'
+    q.thuocChuong = '1'
+    q.maCauHoi = vs[4]
+    q.noiDung = vs[5]
+    q.save()
+    for i in xrange(6,10):
+        if len(vs[i])==0:
+            continue
+        a = Answer()
+        a.dapAn = vs[i]
+        a.question = q
+        if i == 6:
+            a.isCorrect = 1
+        a.save()

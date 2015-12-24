@@ -1,8 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from django.contrib.admin.options import TabularInline, ModelAdmin
-from tracnghiem.models import Answer, QuestionGroup_Setting, Chapter_Setting,\
-    CaThi, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
+from tracnghiem.models import Answer, CaThi, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
     NganHangDe
 
 from django.contrib import admin
@@ -88,7 +87,7 @@ class TFQuestionAdmin(ModelAdmin):
     
 class NganHangDeAdmin(ModelAdmin):
     model=NganHangDe
-    list_display=('maDeThi', 'get_monHoc', 'get_doiTuong', 'ngay_tao', 'daDuyet')
+    list_display=('maDeThi', 'get_monHoc', 'get_doiTuong', 'ngay_tao', 'daDuyet', 'export_pdf')
     
     list_filter=('logSinhDe__doiTuong', 'logSinhDe__monHoc', 'ngay_tao', 'daDuyet')
     actions=['duyet_deThi', 'boDuyet_deThi']
@@ -109,6 +108,12 @@ class NganHangDeAdmin(ModelAdmin):
     def boDuyet_deThi(self, request, queryset):
         queryset.update(daDuyet=False)
     boDuyet_deThi.short_description = "Bỏ duyệt các đề đã chọn"
+    
+    def export_pdf(self, obj):
+        return u'<a href="%s">PDF</a>' % ('/hvhc/tracnghiem/export/dethi/'+str(obj.pk)+'/')
+    export_pdf.allow_tags=True
+    export_pdf.short_description="Đề thi"
+
     
 # class EssayQuestionAdmin(ModelAdmin):
 #     list_display=('mon_thi', 'content',)

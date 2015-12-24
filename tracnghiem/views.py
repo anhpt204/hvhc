@@ -9,9 +9,11 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_protect
 
 from datetime import datetime
-from tracnghiem.models import CaThi, DeThi, LogSinhDe
+from tracnghiem.models import CaThi, LogSinhDe, NganHangDe, Question, Answer
 import json
 from django.views.generic.detail import DetailView
+from tracnghiem.util import export_pdf
+from _io import BytesIO
 
 
 def index(request):
@@ -39,13 +41,13 @@ def login_user(request):
         if user is not None:
             login(request, user)
             
-            dethi = DeThi.objects.filter(sinh_vien__ma_sv=username, ca_thi=cathi_id)[0]
+            dethi = NganHangDe.objects.filter(sinh_vien__ma_sv=username, ca_thi=cathi_id)[0]
             return HttpResponseRedirect('/quiz/cathi/' + str(dethi.id) + '/')
          
     return HttpResponse(template.render(context))
 
 def quiz_finish(request, pk):
-    dethi = DeThi.objects.get(pk=pk)
+    dethi = NganHangDe.objects.get(pk=pk)
 
     answers = {}
     
@@ -64,7 +66,7 @@ def quiz_finish(request, pk):
     return HttpResponse('Tinhs diem')
 
 class CathiDetailView(DetailView):
-    model = DeThi
+    model = CaThi
     template_name='cathi_detail.html'
 #     pk_url_kwarg = 'cathi'
     
@@ -73,7 +75,7 @@ class CathiDetailView(DetailView):
 
 
 class DethiStartView(DetailView):
-    model = DeThi
+    model = NganHangDe
     template_name = 'dethi_start.html'
     
 #     def get(self, request, *args, **kwargs):
@@ -95,3 +97,21 @@ def sinhde(request, pk):
     
     # if ok then render to a new page that list all generated dethi
     return HttpResponse(msg)
+
+def export(request, pk):
+    dethi = NganHangDe.objects.get(pk=pk)
+    dapan = {}
+    id_cauhois = dethi.questions.split(',')
+    for id_cauhoi in id_cauhois:
+        cauhoi = Question.objects.get(pk = id_cauhoi)
+        answers = Answer.objects.filter(question=cauhoi)
+        dapan[cauhoi] = answers
+         
+    pdf = export_pdf(dethi, dapan)
+    file_name = dethi.maDeThi + '.pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+file_name
+     
+ 
+    response.write(pdf)
+    return response
