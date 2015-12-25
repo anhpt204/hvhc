@@ -111,7 +111,8 @@ TIME_INPUT_FORMATS=("%H:%M",)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_ROOT = '/var/www/hvhc/static/'
+#STATIC_ROOT = '/var/www/hvhc/static/'
+STATIC_ROOT = '/home/pta/git/hvhc/static/'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (

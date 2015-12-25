@@ -111,8 +111,8 @@ def export_pdf(dethi, dapan):
     export de thi trac nghiem ra pdf
     '''
     socau = len(dapan)
-    table_data.append([u'KHOA: K8', u'MÔN: ' + dethi.logSinhDe.monHoc.ten_mon_thi])
-    table_data.append([u'', u'Đối tượng: ' + dethi.logSinhDe.doiTuong.ten_dt])
+    table_data.append([u'KHOA: K8', u'MÔN: ' + de_thi.logSinhDe.monHoc.ten_mon_thi])
+    table_data.append([u'', u'Đối tượng: ' + de_thi.logSinhDe.doiTuong.ten_dt])
     table_data.append([u'', u'Thời gian: '])
     table_data.append([u'', u'Đề gồm: ' + str(socau) + u' câu'])
 
@@ -131,7 +131,7 @@ def export_pdf(dethi, dapan):
 
     pars.append(Spacer(1, 0.5*inch))
 
-    sv_info_table_data = [[u'Mã môn học: '+ dethi.logSinhDe.monHoc.ma_mon_thi + u'     - Số tín chỉ (hoặc đvht):    ' , u'Mã đề thi']]
+    sv_info_table_data = [[u'Mã môn học: '+ de_thi.logSinhDe.monHoc.ma_mon_thi + u'     - Số tín chỉ (hoặc đvht):    ' , u'Mã đề thi']]
     sv_info_table_data.append([u'Lớp: ' ,dethi.maDeThi])
     sv_info_table_data.append([u'Mã học viên, sinh viên: ',''])
     sv_info_table_data.append([u'Họ tên học viên, sinh viên: ',''])

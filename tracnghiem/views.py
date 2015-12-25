@@ -9,11 +9,11 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_protect
 
 from datetime import datetime
-from tracnghiem.models import CaThi, LogSinhDe, NganHangDe, Question, Answer
+from tracnghiem.models import LogSinhDe, NganHangDe, Question, Answer, KHThi
 import json
 from django.views.generic.detail import DetailView
-from tracnghiem.util import export_pdf
 from _io import BytesIO
+from tracnghiem.util import export_pdf
 
 
 def index(request):
@@ -25,7 +25,7 @@ def login_user(request):
     
 #     ds_mothi = MonThi.objects.all();
     today = datetime.now().date()
-    ds_cathi = CaThi.objects.filter(ngay_thi=today)
+    ds_cathi = KHThi.objects.filter(ngay_thi=today)
     template = loader.get_template('login.html')
     context = RequestContext(request, {
         'ds_cathi': ds_cathi,
@@ -66,7 +66,7 @@ def quiz_finish(request, pk):
     return HttpResponse('Tinhs diem')
 
 class CathiDetailView(DetailView):
-    model = CaThi
+    model = KHThi
     template_name='cathi_detail.html'
 #     pk_url_kwarg = 'cathi'
     
@@ -115,3 +115,12 @@ def export(request, pk):
  
     response.write(pdf)
     return response
+
+def boc_tron_de_thi(request, pk):
+    khthi = KHThi.objects.get(pk=pk)
+    
+    succ = khthi.boc_va_tron_de()
+    if succ:
+        return HttpResponse("Boc va tron de thanh cong!")
+    else:
+        return HttpResponse("Boc va tron de KHONG thanh cong!")

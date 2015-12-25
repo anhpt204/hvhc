@@ -9,12 +9,12 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 from hrm.models import SinhVien, GiaoVien
 from random import sample
 from hvhc import MCQUESTION, TFQUESTION, QUESTION_TYPES, ANSWER_ORDER_OPTIONS,\
-    ESSAYQUESTION
+    ESSAYQUESTION, HOC_KY, HK1
 import json
 from daotao.models import Lop, MonThi, DoiTuong
 import random
 from django.utils import timezone
-from tracnghiem.util import export_pdf
+from wx import SL_AUTOTICKS
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
     name = CharField(verbose_name="Nhóm câu hỏi", 
@@ -360,68 +360,137 @@ class NganHangDe(models.Model):
         verbose_name="Ngân hàng đề thi"
         verbose_name_plural="Ngân hàng đề thi"
         
-    def bocVaTronDe(self, idMonHoc, idDoiTuong, soLuong):
-        '''
-        Boc de thi trong ngan hang de theo mon hoc va doi tuong.
-        Sau khi co de thi, tien hanh tron de thi thanh (soLuong) de
-        '''
-        pass
     
-class CaThi(models.Model):
+class KHThi(models.Model):
     '''
     Thiet lap mot ca thi, trong do co danh sach cau hoi de tu do lam
     cac de thi cho tung sinh vien
     '''
-    title = CharField(verbose_name="Ca thi", max_length=200, blank=False)
+    ten = CharField(verbose_name=u"Tên", max_length=200, blank=False)
     
-    description=TextField(verbose_name="Ghi chú", blank=True, null=True)
-    monHoc = ForeignKey(MonThi, blank=False, null=False,
+    nam_hoc = CharField(max_length=9,
+                        verbose_name=u"Năm học",
+                        help_text=u"Nhập năm học theo định dạng XXXX-XXXX. Ví dụ 2015-2016")
+    
+    hoc_ky = CharField(max_length=3,
+                              choices=HOC_KY,
+                            default=HK1,
+                            verbose_name=u"Học kỳ")
+
+    doi_tuong = ForeignKey(DoiTuong,
+                           verbose_name=u"Đối tượng")
+
+    mon_thi = ForeignKey(MonThi, blank=False, null=False,
                          related_name='%(class)s_monthi_cathi',
                          verbose_name="Môn thi")
-    ds_giamthi = ManyToManyField(GiaoVien, related_name='%(class)s_giamthi_cathi', 
+    
+    ds_giamthi = ManyToManyField(GiaoVien, related_name='%(class)s_giamthi_khthi', 
                                  verbose_name=u'Danh sách giám thị coi thi')
     
-    ds_thisinh = ManyToManyField(SinhVien, blank=False, 
-                                verbose_name=u"Danh sách thí sinh")
-    ds_thisinh.help_text = 'Tìm kiếm theo họ tên sinh viên hoặc mã lớp.'
+    ds_thisinh = ManyToManyField(SinhVien, blank=False, related_name='%(class)s_sinhvien_khthi',
+                                verbose_name=u'Danh sách thí sinh')
+#     ds_thisinh.help_text = u'Tìm kiếm theo họ tên sinh viên hoặc mã lớp.'
     
     ngay_thi = DateField(verbose_name="Ngày thi")
     tg_bat_dau=TimeField(verbose_name="Thời gian bắt đầu")
     tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
     
-    dethi = ForeignKey(NganHangDe, verbose_name = "Đề thi")
+#     de_thi = ForeignKey(NganHangDe, verbose_name = "Đề thi")
+    de_thi = TextField(default=json.dumps({}))
+    # dict id cau hoi: id dap an dung
+    dap_an = TextField(default=json.dumps({}))
 
     tao_moi_de_thi = BooleanField(blank=False, null=False,
                                   verbose_name="Tạo mới đề thi cho các sinh viên",
                                   default=True)
     
-    random_order = BooleanField(blank=False, null=False,
-                                verbose_name="Hiển thị câu hỏi ngẫu nhiên",
-                                default=True)
-    answers_at_end = BooleanField(blank=False, null=False,
-                                  verbose_name="Hiển thị câu trả lời khi kết thúc",
-                                  default=False)
-    result_at_end = BooleanField(blank=False, null=False,
-                               verbose_name="Hiển thị kết quả khi kết thúc",
-                               default=True)
-    exam_paper = BooleanField(blank=False, null=False,
-                              verbose_name="Lưu bài thi",
-                              default=True)
-    single_attempt = BooleanField(blank=False, null=False,
-                                  verbose_name="Mỗi người một đề thi",
-                                  default=True)
-    pass_mark = PositiveIntegerField(verbose_name="Điểm đạt yêu cầu")
-    success_text = TextField(blank=True,
-                             verbose_name="Thông báo được hiển thị nếu thí sinh vượt qua")
-    fail_text = TextField(blank=True,
-                          verbose_name="Thông báo được hiển thị nếu thí sinh không vượt qua")
-    draft=BooleanField(verbose_name="Bản nháp", 
-                       default=False)
+    so_luong_de = PositiveIntegerField(verbose_name="Số lượng đề thi tạo ra", default=0)
+    so_luong_de.help_text = u'Nhập giá trị >= 0, nhập 0 sẽ sinh mỗi sinh viên một đề'
+    ghichu=TextField(verbose_name="Ghi chú", blank=True, null=True)
     
     class Meta:
-        verbose_name = "Ca thi"
-        verbose_name_plural = "Danh sách ca thi"
+        verbose_name = u"Kế hoạch thi - bốc đề"
+        verbose_name_plural = u"Kế hoạch thi - bốc đề"
 
     def __unicode__(self):
-        return u'%s' %(self.title)
+        return u'%s' %(self.ten)
+    
+    def boc_va_tron_de(self):
+        '''
+        Boc de thi trong ngan hang de theo mon hoc va doi tuong.
+        Sau khi co de thi, tien hanh tron de thi thanh (soLuong) de
+        '''
+        ngan_hang_de = NganHangDe.objects.filter(logSinhDe__monHoc=self.mon_thi).filter(logSinhDe__doiTuong=self.doi_tuong).filter(daDuyet=True)
+        if len(ngan_hang_de)==0:
+            return False
+        # boc de
+        de_thi = random.choice(ngan_hang_de)
+        
+        id_cauhois = de_thi.questions.split(',')
+        de_thi_dict = {}
+        dap_an_dict={}
+        for id_cauhoi in id_cauhois:
+            cauhoi = Question.objects.get(pk = id_cauhoi)
+            answers = Answer.objects.filter(question=cauhoi)
+            de_thi_dict[id_cauhoi] = []
+            for a in answers:
+                de_thi_dict[id_cauhoi].append(a.id)
+                if a.isCorrect:
+                    dap_an_dict[id_cauhoi] = a.id        
+        self.de_thi = json.dumps(de_thi_dict)
+        self.dap_an = json.dumps(dap_an_dict)
+        self.save()
+        
+        # tron de cho tung sinh vien tham gia
+        # delete old records if have the same thi_sinh and khthi
+        ds_thisinh = self.ds_thisinh.all()
+        for sv in ds_thisinh:
+            bts = BaiThi.objects.filter(khthi = self).filter(thi_sinh=sv)
+            for bt in bts:
+                bt.delete()
+
+            bai_thi = BaiThi()
+            bai_thi.khthi = self
+            bai_thi.thi_sinh = sv 
+            ds_cauhoi_dict = {}
+            q_ids = random.sample(id_cauhois, len(id_cauhois))
+            for q_id in q_ids:
+                ds_cauhoi_dict[q_id] = random.sample(de_thi_dict[q_id], len(de_thi_dict[q_id]))
+            bai_thi.ds_cauhoi = json.dumps(ds_cauhoi_dict)
+            bai_thi.tra_loi = {}
+            bai_thi.diem = 0
+            bai_thi.save()
+            
+        return True
+        
+class BaiThi(models.Model):
+    '''
+    Bai thi cua moi sinh vien cho tung mon
+    '''
+    khthi = ForeignKey(KHThi)
+    thi_sinh = ForeignKey(SinhVien, verbose_name="Sinh viên", to_field='ma_sv')
+    ds_cauhoi = TextField(default={})
+    tra_loi = TextField(default={})
+    diem = PositiveIntegerField(verbose_name="Điểm")
+    
+    def cham_diem(self):
+        tra_loi_dict = json.loads(self.tra_loi)
+        dap_an_dict = json.loads(self.khthi.dap_an)
+        so_cau_dung = 0
+        for k,v in tra_loi_dict.items():
+            if dap_an_dict[k] == v:
+                so_cau_dung += 1
+                
+        return so_cau_dung
+    
+    class Meta:
+        verbose_name = u'Bài thi'
+        verbose_name_plural = u"Kế hoạch thi - bốc đề"
+        unique_together = ("khthi", "thi_sinh")
+        
+    def __unicode__(self):
+        return u'%s' %(self.thi_sinh.ho_ten)
+    
+    def in_bai_thi(self):
+        pass
     

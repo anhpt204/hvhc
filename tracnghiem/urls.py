@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^cathi/(?P<pk>[\d]+)/start/finish/$', views.quiz_finish, name='quiz_finish'),
     url(r'^sinhde/(?P<pk>[\d]+)/$', views.sinhde, name="sinh danh sach de thi"),
     url(r'^export/dethi/(?P<pk>[\d]+)/$', views.export, name="export de thi"),
+    url(r'^khthi/boctrondethi/(?P<pk>[\d]+)/$', views.boc_tron_de_thi, name="boc va tron de thi"),
     
 ]

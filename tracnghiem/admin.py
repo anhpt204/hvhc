@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
 
 from django.contrib.admin.options import TabularInline, ModelAdmin
-from tracnghiem.models import Answer, CaThi, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
-    NganHangDe
+from tracnghiem.models import Answer, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
+    NganHangDe, KHThi, BaiThi
 
 from django.contrib import admin
+import json
 
 class AnswerInLine(TabularInline):
     model = Answer
@@ -114,15 +115,34 @@ class NganHangDeAdmin(ModelAdmin):
     export_pdf.allow_tags=True
     export_pdf.short_description="Đề thi"
 
+class KHThiAdmin(ModelAdmin):    
+    model=KHThi
+    filter_horizontal =('ds_thisinh', 'ds_giamthi')
+    list_display = ['ten', 'mon_thi', 'doi_tuong', 'nam_hoc', 'hoc_ky', 
+                    'ngay_thi', 'tg_bat_dau', 'tg_ket_thuc', 'boc_tron_de']
     
-# class EssayQuestionAdmin(ModelAdmin):
-#     list_display=('mon_thi', 'content',)
-#     list_filter = ('mon_thi',)
-#     fields = ('mon_thi', 'content',
-#               'figure', 'question_group', 'answer' )
+    fields = ['ten', 'mon_thi', 'nam_hoc', 'hoc_ky', 'doi_tuong', 
+            'ds_thisinh',
+            'ds_giamthi', 
+              'ngay_thi', 'tg_bat_dau', 'tg_ket_thuc']
+    
+    def boc_tron_de(self, obj):
+        dethi = json.loads(obj.de_thi)
+        if len(dethi) == 0:
+            return u'<a href="%s">Bốc đề</a>' % ('/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
+        else:
+            return u'Đã có, <a href="%s">Bốc lại</a>' % ('/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
+    boc_tron_de.allow_tags=True
+    boc_tron_de.short_description="Thực hiện"
+    
+class DiemAdmin(ModelAdmin):
+    model = BaiThi
+    list_display = ['thi_sinh', 'diem']
     
 admin.site.register(LogSinhDe, LogSinhDeAdmin)
 admin.site.register(NganHangDe, NganHangDeAdmin)
 admin.site.register(QuestionGroup, QuestionGroupAdmin)
 admin.site.register(MCQuestion, MCQuestionAdmin)
 admin.site.register(TFQuestion, TFQuestionAdmin)
+admin.site.register(KHThi, KHThiAdmin)
+admin.site.register(BaiThi, DiemAdmin)
