@@ -1,0 +1,59 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+{% extends 'base.html' %}
+
+
+
+{% block title %}
+Làm bài thi
+{% endblock %}
+
+
+{% block content %}
+<div class="jumbotron">
+  <h1>{{ object.khthi.ten }}</h1>
+  
+  <h4>Môn thi: {{ object.khthi.mon_thi }}</h4>
+  <h4>Họ tên: {{ object.thi_sinh.ho_ten }}</h4>
+  <h4>Lớp: {{ object.khthi.lop_thi }}</h4>
+  <h4>Ngày: {{ object.khthi.ngay_thi|date:"d/m/Y" }}</h4>
+  <h4>Thời gian bắt đầu: {{ object.khthi.tg_bat_dau|time:"H:i" }}</h4>
+  <h4>Thời gian kết thúc: {{ object.khthi.tg_ket_thuc|time:"H:i" }}</h4>
+  
+  <form action="../finish/" method="POST">
+  	{% csrf_token %}
+	{% for q, answers in questions %}
+		<div class="question">
+		<hr />
+		<h4>Câu {{forloop.counter}}: {{ q.noiDung }}</h5>
+		
+		{% for a in answers %}
+			{% if a.id in traloi %}			
+				<input type="radio" name="{{ q.id }}" value="{{ a.id }} checked"> {{ a.dapAn }} </input>
+			
+			{% else %}
+			
+				<input type="radio" name="{{ q.id }}" value="{{ a.id }}"> {{ a.dapAn }} </input>
+			
+			{% endif %}
+			<br />
+		{% empty %}
+		{% endfor %}
+			<input type="button" value="Lưu"></input>
+		</div>
+		
+	{% empty %}
+		<li>Không có câu hỏi nào</li>
+	{% endfor %}
+	
+	<br />
+ 	<input class="btn btn-primary btn-lg" type = "submit" name="hoanthanh" value="Hoàn thành" />
+  
+  </form>
+  
+
+</div>
+
+
+
+{% endblock %}

@@ -65,7 +65,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [join(BASE_DIR,'templates'),
-                 join(BASE_DIR, 'templates/quiz/'),
+                 join(BASE_DIR, 'templates/tuluan/'),
                  join(BASE_DIR, 'templates/tracnghiem/'),
                  ],
         'APP_DIRS': True,
@@ -116,11 +116,11 @@ TIME_INPUT_FORMATS=("%H:%M",)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 #STATIC_ROOT = '/var/www/hvhc/static/'
-STATIC_ROOT = join(BASE_DIR,'static/')
+# STATIC_ROOT = join(BASE_DIR,'static/')
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "static"),
 #    '/var/www/hvhc/static/',
 # 	'/var/www/hvhc/media',
 # 	'/var/www/hvhc/locate',

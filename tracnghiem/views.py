@@ -42,42 +42,45 @@ def login_user(request):
         if user is not None:
             login(request, user)
             
-            dethi = NganHangDe.objects.filter(sinh_vien__ma_sv=username, ca_thi=cathi_id)[0]
-            return HttpResponseRedirect('/quiz/cathi/' + str(dethi.id) + '/')
+            baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)[0]
+            return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
          
     return HttpResponse(template.render(context))
 
 def quiz_finish(request, pk):
-    dethi = NganHangDe.objects.get(pk=pk)
-
+    baithi = BaiThi.objects.get(pk=pk)
+        
     answers = {}
     
     if request.POST:
-        questions = json.loads(dethi.ds_cau_hoi)
-        for question in questions:
-            q_id = str(question[0])
+        questions = json.loads(baithi.ds_cauhoi)
+        for q_id,_ in questions:
             try:
-                answers[question[0]] = int(request.POST[q_id])
+                answers[q_id] = int(request.POST[q_id])
             except:
                 continue
-            
-    dethi.user_answers = json.dumps(answers)
-    
-    dethi.save()
-    return HttpResponse('Tinhs diem')
 
-class CathiDetailView(DetailView):
-    model = KHThi
-    template_name='cathi_detail.html'
+    baithi.save_tralois(answers)
+    baithi.cham_diem()
+    
+#     user = request.user
+#     user.logout()
+    logout(request)
+    
+    return HttpResponse('Diem = ' + str(baithi.diem))
+
+class BaiThiDetailView(DetailView):
+    model = BaiThi
+    template_name='baithi_detail.html'
 #     pk_url_kwarg = 'cathi'
     
 #     def get(self, request, *args, **kwargs):
 #         return DetailView.get(self, request, *args, **kwargs)
 
 
-class DethiStartView(DetailView):
-    model = NganHangDe
-    template_name = 'dethi_start.html'
+class BaiThiStartView(DetailView):
+    model = BaiThi
+    template_name = 'baithi_start.html'
     
 #     def get(self, request, *args, **kwargs):
 #         object = DetailView.get(self, request, *args, **kwargs)
@@ -88,7 +91,8 @@ class DethiStartView(DetailView):
         context = DetailView.get_context_data(self, **kwargs)
         
                 
-        context['questions'] = self.object.get_ds_cau_hoi()
+        context['questions'] = self.object.get_ds_cauhoi()
+        context['traloi'] = self.object.get_traloi().values()
         
         return context
     
@@ -120,24 +124,10 @@ def export(request, pk):
 
 def export_baithi_cauhoi(request, pk):
     baithi = BaiThi.objects.get(pk=pk)
-    dapan = []
-    ds_cauhoi = json.loads(baithi.ds_cauhoi)
-    
-    for i in xrange(len(ds_cauhoi)):
-        cauhoi_id, pa_ids = ds_cauhoi[i]
-        
-        cauhoi = Question.objects.get(pk = cauhoi_id)
-        
-        answers = []
-        for j in xrange(len(pa_ids)):
-            pa_id = pa_ids[j]
-            pa = Answer.objects.get(pk=pa_id)
-            answers.append(pa)
-            
-        dapan.append([cauhoi, answers])
+    ds_cauhoi = baithi.get_ds_cauhoi()
          
     dethi = NganHangDe.objects.get(pk = baithi.khthi.de_thi_id)
-    pdf = export_pdf(dethi, dapan)
+    pdf = export_pdf(dethi, ds_cauhoi)
     
     file_name = str(baithi.thi_sinh.ma_sv) + '.pdf'
     response = HttpResponse(content_type='application/pdf')

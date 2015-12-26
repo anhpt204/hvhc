@@ -496,15 +496,7 @@ class BaiThi(models.Model):
     tra_loi = TextField(default={})
     diem = PositiveIntegerField(verbose_name="Điểm")
     
-    def cham_diem(self):
-        tra_loi_dict = json.loads(self.tra_loi)
-        dap_an_dict = json.loads(self.khthi.dap_an)
-        so_cau_dung = 0
-        for k,v in tra_loi_dict.items():
-            if dap_an_dict[k] == v:
-                so_cau_dung += 1
-                
-        return so_cau_dung
+    
     
     class Meta:
         verbose_name = u'Bài thi'
@@ -514,6 +506,57 @@ class BaiThi(models.Model):
     def __unicode__(self):
         return u'%s' %(self.thi_sinh.ho_ten)
     
+    def cham_diem(self):
+        tra_loi_dict = json.loads(self.tra_loi)
+        dap_an_dict = json.loads(self.khthi.dap_an)
+        so_cau_dung = 0
+        for k,v in tra_loi_dict.items():
+            if dap_an_dict[k] == v:
+                so_cau_dung += 1
+                
+        self.diem = so_cau_dung
+        self.save()
+        
+    def get_ds_cauhoi(self):
+        '''
+        return [[cau_hoi,[pa1, pa2, pa3, pa4]], ....[..]]
+        '''
+        ds_cauhoi_list = []
+        ds_cauhoi = json.loads(self.ds_cauhoi)
+    
+        for i in xrange(len(ds_cauhoi)):
+            cauhoi_id, pa_ids = ds_cauhoi[i]
+        
+            cauhoi = Question.objects.get(pk = cauhoi_id)
+        
+            answers = []
+            for j in xrange(len(pa_ids)):
+                pa_id = pa_ids[j]
+                pa = Answer.objects.get(pk=pa_id)
+                answers.append(pa)
+            
+            ds_cauhoi_list.append([cauhoi, answers])
+        return ds_cauhoi_list
+
+    def get_traloi(self):
+        '''
+        return {question_id: answer_id}
+        '''        
+        traloi_dict = json.loads(self.tra_loi)
+        
+        return traloi_dict
+    
+    def save_tralois(self, traloi_dict):
+        self.tra_loi = json.dumps(traloi_dict)
+        self.save()
+
+    def update_traloi(self, question_id, answer_id):
+        traloi = json.loads(self.tra_loi)
+        traloi[question_id] = answer_id
+        self.tra_loi = json.dumps(traloi)
+        self.save()
+        
+        
     def in_bai_thi(self):
         pass
     
