@@ -33,7 +33,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-#	'django_admin_bootstrapped',
+#     'django_admin_bootstrapped.bootstrap3',
+	'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -115,14 +116,16 @@ TIME_INPUT_FORMATS=("%H:%M",)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 #STATIC_ROOT = '/var/www/hvhc/static/'
-# STATIC_ROOT = 'static/'
+STATIC_ROOT = join(BASE_DIR,'static/')
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
+#     os.path.join(BASE_DIR, "static"),
 #    '/var/www/hvhc/static/',
-	'/var/www/hvhc/media',
-	'/var/www/hvhc/locate',
+# 	'/var/www/hvhc/media',
+# 	'/var/www/hvhc/locate',
+    join(BASE_DIR, 'media'),
+    join(BASE_DIR, 'locale'),
 )
 
 ADMIN_MEDIA_PREFIX='/static/admin/'
@@ -135,5 +138,5 @@ LOCALE_PATHS = (
 
 DAB_FIELD_RENDERER = 'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
 
-MEDIA_ROOT= '/home/pta/git/hvhc/media/'
+MEDIA_ROOT= join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
