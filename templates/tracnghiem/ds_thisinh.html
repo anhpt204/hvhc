@@ -1,0 +1,62 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+{% extends 'base.html' %}
+
+
+
+{% block title %}
+Danh sách thí sinh
+{% endblock %}
+
+
+{% block content %}
+<div class="dsthisinh">
+  <h1>{{ khthi.ten }}</h1>
+  <h4>Năm học: {{ khthi.nam_hoc }}</h4>
+  <h4>Học kỳ: {{ khthi.hoc_ky }}</h4>
+  
+  <h4>Môn thi: {{ khthi.mon_thi }}</h4>
+  <h4>Ngày thi: {{ object.ngay_thi|date:"d/m/Y" }}</h4>
+  
+  <h4>Giám thị:
+  	<h5>
+  	{% for gt in khthi.ds_giamthi.all %}
+  		 {{ forloop.counter }}. {{ gt.ho_ten }} <br />
+  	{% empty %}
+  		<li>Không có giám thị</li>
+  	{% endfor %}
+  	</h5>
+  </h4>
+  <table>
+  	<tr>
+  		<th scope="col">STT</th>
+  		<th scope="col">Mã SV</th>
+  		<th scope="col">Họ tên</th>
+  		<th scope="col">Lớp</th>
+  		<th scope="col">Đối tượng</th>
+  		<th scope="col">Đề thi</th>
+  		<th scope="col">Trả lời</th>
+  		<th scope="col">Đáp án</th>  		
+  	</tr>
+  	
+	{% for bt,noidung in ds_baithi.items %}
+  	<tr>
+  		<td> {{ forloop.counter }}</td>
+  		<td>{{bt.thi_sinh.ma_sv}}</td>
+  		<td>{{bt.thi_sinh.ho_ten}}</td>
+  		<td>{{bt.thi_sinh.lop.ten_lop}}</td>
+  		<td>{{bt.thi_sinh.lop.doi_tuong.ten_dt}}</td>
+  		<td><a href="export/{{ bt.id }}/">PDF</a></td>
+  		<td>PDF</td>
+  		<td>PDF</td>  		
+  	</tr>
+	
+	{% empty %}
+  		<li>Chưa có đề thi</li>	
+	{% endfor %}
+  </table> 
+</div>
+
+
+
+{% endblock %}

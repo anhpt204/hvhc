@@ -18,18 +18,17 @@ from _io import BytesIO
 from hvhc import settings
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib import colors
+from os.path import join
 # PAGE_HEIGHT=defaultPageSize[1]; PAGE_WIDTH=defaultPageSize[0]
 
-pdfmetrics.registerFont(TTFont('Times', settings.STATIC_ROOT + 'fonts/times.ttf'))
-pdfmetrics.registerFont(TTFont('TimesBd', settings.STATIC_ROOT + 'fonts/timesbd.ttf'))
-pdfmetrics.registerFont(TTFont('TimesIt', settings.STATIC_ROOT + 'fonts/timesi.ttf'))
-pdfmetrics.registerFont(TTFont('TimesBI', settings.STATIC_ROOT + 'fonts/timesbi.ttf'))
+pdfmetrics.registerFont(TTFont('Times', join(settings.BASE_DIR, 'static/fonts/times.ttf')))
+pdfmetrics.registerFont(TTFont('TimesBd', join(settings.BASE_DIR, 'static/fonts/timesbd.ttf')))
+pdfmetrics.registerFont(TTFont('TimesIt', join(settings.BASE_DIR, 'static/fonts/timesi.ttf')))
+pdfmetrics.registerFont(TTFont('TimesBI', join(settings.BASE_DIR, 'static/fonts/timesbi.ttf')))
 
 styles = getSampleStyleSheet()
 PAGE_WIDTH, PAGE_HEIGHT = A4
 print PAGE_WIDTH, PAGE_HEIGHT, inch, PAGE_WIDTH/inch, PAGE_HEIGHT/inch 
-table_data=[]
-table_data.append([u'HỌC VIỆN HẬU CẦN', u'ĐỀ THI KẾT THÚC MÔN'])
 
 
 question_style= ParagraphStyle(
@@ -106,11 +105,13 @@ def myLaterPages(canvas, doc):
     canvas.restoreState()
     
     
-def export_pdf(dethi, dapan):
+def export_pdf(de_thi, dapan):
     '''
     export de thi trac nghiem ra pdf
     '''
     socau = len(dapan)
+    table_data=[]
+    table_data.append([u'HỌC VIỆN HẬU CẦN', u'ĐỀ THI KẾT THÚC MÔN'])
     table_data.append([u'KHOA: K8', u'MÔN: ' + de_thi.logSinhDe.monHoc.ten_mon_thi])
     table_data.append([u'', u'Đối tượng: ' + de_thi.logSinhDe.doiTuong.ten_dt])
     table_data.append([u'', u'Thời gian: '])
@@ -132,7 +133,7 @@ def export_pdf(dethi, dapan):
     pars.append(Spacer(1, 0.5*inch))
 
     sv_info_table_data = [[u'Mã môn học: '+ de_thi.logSinhDe.monHoc.ma_mon_thi + u'     - Số tín chỉ (hoặc đvht):    ' , u'Mã đề thi']]
-    sv_info_table_data.append([u'Lớp: ' ,dethi.maDeThi])
+    sv_info_table_data.append([u'Lớp: ' ,de_thi.maDeThi])
     sv_info_table_data.append([u'Mã học viên, sinh viên: ',''])
     sv_info_table_data.append([u'Họ tên học viên, sinh viên: ',''])
 
@@ -147,7 +148,7 @@ def export_pdf(dethi, dapan):
     
     
     n = 1
-    for question, answers in dapan.items():
+    for question, answers in dapan:
         # question
         p = Paragraph(u'Câu ' + str(n) + ": " + question.noiDung, question_style)
         n += 1

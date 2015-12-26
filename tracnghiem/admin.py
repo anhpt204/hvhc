@@ -131,7 +131,8 @@ class KHThiAdmin(ModelAdmin):
         if len(dethi) == 0:
             return u'<a href="%s">Bốc đề</a>' % ('/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
         else:
-            return u'Đã có, <a href="%s">Bốc lại</a>' % ('/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
+            return u'<a href="%s">Đã có</a>, <a href="%s">Bốc lại</a>' % ('/hvhc/tracnghiem/khthi/show/'+str(obj.pk)+'/','/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
+   
     boc_tron_de.allow_tags=True
     boc_tron_de.short_description="Thực hiện"
     

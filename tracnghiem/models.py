@@ -14,7 +14,6 @@ import json
 from daotao.models import Lop, MonThi, DoiTuong
 import random
 from django.utils import timezone
-from wx import SL_AUTOTICKS
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
     name = CharField(verbose_name="Nhóm câu hỏi", 
@@ -395,7 +394,8 @@ class KHThi(models.Model):
     tg_bat_dau=TimeField(verbose_name="Thời gian bắt đầu")
     tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
     
-#     de_thi = ForeignKey(NganHangDe, verbose_name = "Đề thi")
+    de_thi_id = PositiveIntegerField(null=True)
+    
     de_thi = TextField(default=json.dumps({}))
     # dict id cau hoi: id dap an dung
     dap_an = TextField(default=json.dumps({}))
@@ -425,6 +425,7 @@ class KHThi(models.Model):
             return False
         # boc de
         de_thi = random.choice(ngan_hang_de)
+        self.de_thi_id = de_thi.id
         
         id_cauhois = de_thi.questions.split(',')
         de_thi_dict = {}
@@ -452,16 +453,38 @@ class KHThi(models.Model):
             bai_thi = BaiThi()
             bai_thi.khthi = self
             bai_thi.thi_sinh = sv 
-            ds_cauhoi_dict = {}
+            ds_cauhoi = []
             q_ids = random.sample(id_cauhois, len(id_cauhois))
             for q_id in q_ids:
-                ds_cauhoi_dict[q_id] = random.sample(de_thi_dict[q_id], len(de_thi_dict[q_id]))
-            bai_thi.ds_cauhoi = json.dumps(ds_cauhoi_dict)
+                ds_cauhoi.append([q_id, random.sample(de_thi_dict[q_id], len(de_thi_dict[q_id]))])
+            bai_thi.ds_cauhoi = json.dumps(ds_cauhoi)
             bai_thi.tra_loi = {}
             bai_thi.diem = 0
             bai_thi.save()
             
         return True
+    
+    def get_ds_baithi(self):
+        '''
+        return {baithi: [[cauhoi,[phuong an tra loi]]]}}
+        '''
+        ds_baithi_dict = {}
+        
+        ds_baithi = BaiThi.objects.filter(khthi=self)
+        
+        for baithi in ds_baithi:
+            ds_cauhoi = json.loads(baithi.ds_cauhoi)
+            ds_baithi_dict[baithi] = []
+            for qid, pa_ids in ds_cauhoi:
+                q = Question.objects.get(pk=qid)
+                pas = []
+                for pa_id in pa_ids:
+                    pas.append(Answer.objects.get(pk=pa_id))
+                    
+                ds_baithi_dict[baithi].append([q, pas])
+                
+        return ds_baithi_dict
+            
         
 class BaiThi(models.Model):
     '''
@@ -485,7 +508,7 @@ class BaiThi(models.Model):
     
     class Meta:
         verbose_name = u'Bài thi'
-        verbose_name_plural = u"Kế hoạch thi - bốc đề"
+        verbose_name_plural = u"Bài thi"
         unique_together = ("khthi", "thi_sinh")
         
     def __unicode__(self):

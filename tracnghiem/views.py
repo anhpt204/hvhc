@@ -9,7 +9,8 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_protect
 
 from datetime import datetime
-from tracnghiem.models import LogSinhDe, NganHangDe, Question, Answer, KHThi
+from tracnghiem.models import LogSinhDe, NganHangDe, Question, Answer, KHThi,\
+    BaiThi
 import json
 from django.views.generic.detail import DetailView
 from _io import BytesIO
@@ -100,14 +101,15 @@ def sinhde(request, pk):
 
 def export(request, pk):
     dethi = NganHangDe.objects.get(pk=pk)
-    dapan = {}
+    dapan = []
     id_cauhois = dethi.questions.split(',')
     for id_cauhoi in id_cauhois:
         cauhoi = Question.objects.get(pk = id_cauhoi)
         answers = Answer.objects.filter(question=cauhoi)
-        dapan[cauhoi] = answers
+        dapan.append([cauhoi, answers])
          
     pdf = export_pdf(dethi, dapan)
+    
     file_name = dethi.maDeThi + '.pdf'
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename='+file_name
@@ -115,6 +117,36 @@ def export(request, pk):
  
     response.write(pdf)
     return response
+
+def export_baithi_cauhoi(request, pk):
+    baithi = BaiThi.objects.get(pk=pk)
+    dapan = []
+    ds_cauhoi = json.loads(baithi.ds_cauhoi)
+    
+    for i in xrange(len(ds_cauhoi)):
+        cauhoi_id, pa_ids = ds_cauhoi[i]
+        
+        cauhoi = Question.objects.get(pk = cauhoi_id)
+        
+        answers = []
+        for j in xrange(len(pa_ids)):
+            pa_id = pa_ids[j]
+            pa = Answer.objects.get(pk=pa_id)
+            answers.append(pa)
+            
+        dapan.append([cauhoi, answers])
+         
+    dethi = NganHangDe.objects.get(pk = baithi.khthi.de_thi_id)
+    pdf = export_pdf(dethi, dapan)
+    
+    file_name = str(baithi.thi_sinh.ma_sv) + '.pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+file_name
+     
+ 
+    response.write(pdf)
+    return response
+
 
 def boc_tron_de_thi(request, pk):
     khthi = KHThi.objects.get(pk=pk)
@@ -124,3 +156,15 @@ def boc_tron_de_thi(request, pk):
         return HttpResponse("Boc va tron de thanh cong!")
     else:
         return HttpResponse("Boc va tron de KHONG thanh cong!")
+    
+def khthi_show(request, pk):
+    khthi = KHThi.objects.get(pk=pk)
+    ds_baithi = khthi.get_ds_baithi()
+    
+    template = loader.get_template('ds_thisinh.html')
+    context = RequestContext(request, {
+        'khthi':khthi,
+        'ds_baithi': ds_baithi,
+    })
+    
+    return HttpResponse(template.render(context))

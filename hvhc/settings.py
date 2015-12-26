@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.conf.global_settings import MEDIA_ROOT, MEDIA_URL
+from os.path import join
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -62,8 +63,10 @@ ROOT_URLCONF = 'hvhc.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/var/www/hvhc/templates',
-                 '/var/www/hvhc/templates/quiz/'],
+        'DIRS': [join(BASE_DIR,'templates'),
+                 join(BASE_DIR, 'templates/quiz/'),
+                 join(BASE_DIR, 'templates/tracnghiem/'),
+                 ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,11 +115,11 @@ TIME_INPUT_FORMATS=("%H:%M",)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 #STATIC_ROOT = '/var/www/hvhc/static/'
-STATIC_ROOT = '/home/pta/git/hvhc/static/'
+# STATIC_ROOT = 'static/'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-#    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "static"),
 #    '/var/www/hvhc/static/',
 	'/var/www/hvhc/media',
 	'/var/www/hvhc/locate',
