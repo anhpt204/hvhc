@@ -138,8 +138,24 @@ class KHThiAdmin(ModelAdmin):
     
 class DiemAdmin(ModelAdmin):
     model = BaiThi
-    list_display = ['thi_sinh', 'diem']
+    list_display = ['get_ma_sv', 'get_ho_ten', 'get_lop', 'get_mon_thi', 'diem']
     
+    def get_ma_sv(self, obj):
+        return obj.thi_sinh.ma_sv
+    get_ma_sv.short_description = 'Mã SV'
+
+    def get_ho_ten(self, obj):
+        return obj.thi_sinh.ho_ten
+    get_ho_ten.short_description = 'Họ và tên'
+
+    def get_lop(self, obj):
+        return obj.thi_sinh.lop
+    get_lop.short_description = 'Lớp'
+
+    def get_mon_thi(self, obj):
+        return obj.khthi.mon_thi
+    get_mon_thi.short_description='Môn thi'
+        
 admin.site.register(LogSinhDe, LogSinhDeAdmin)
 admin.site.register(NganHangDe, NganHangDeAdmin)
 admin.site.register(QuestionGroup, QuestionGroupAdmin)
