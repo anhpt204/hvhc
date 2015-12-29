@@ -18,3 +18,18 @@ function print1(elementId) {
    //getMyFrame.contentWindow.print();
    //alert(getMyFrame);
 }
+
+
+function saveBaiThi(){
+	
+	//alert(window.location.href);
+	window.location.href = window.location.href+"save/";
+}
+
+function finishBaiThi(){
+	
+	//alert(window.location.href);
+	var newURL = window.location.href + "finish/";
+	alert(newURL);
+	window.location.href = newURL;
+}

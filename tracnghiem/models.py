@@ -14,6 +14,7 @@ import json
 from daotao.models import Lop, MonThi, DoiTuong
 import random
 from django.utils import timezone
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
     name = CharField(verbose_name="Nhóm câu hỏi", 
@@ -559,4 +560,26 @@ class BaiThi(models.Model):
         
     def in_bai_thi(self):
         pass
+    
+class LoggedUser(models.Model):
+    username = models.CharField(max_length=30, primary_key=True)
+    login_time = models.DateTimeField()
+  
+    def __unicode__(self):
+        return self.username
+
+def login_user(sender, request, user, **kwargs):
+    LoggedUser(username=user.username).save()
+
+def logout_user(sender, request, user, **kwargs):
+    if not user:
+        return
+    try:
+        u = LoggedUser.objects.get(username=user.username)
+        u.delete()
+    except LoggedUser.DoesNotExist:
+        pass
+    
+user_logged_in.connect(login_user)
+user_logged_out.connect(logout_user)
     

@@ -1,0 +1,67 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+{% extends 'base.html' %}
+
+
+
+{% block title %}
+Danh sách thí sinh
+{% endblock %}
+
+
+{% block content %}
+<div class="dsthisinh">
+  <h1>{{ khthi.ten }}</h1>
+  <h4>Năm học: {{ khthi.nam_hoc }}</h4>
+  <h4>Học kỳ: {{ khthi.hoc_ky }}</h4>
+  
+  <h4>Môn thi: {{ khthi.mon_thi }}</h4>
+  <h4>Ngày thi: {{ object.ngay_thi|date:"d/m/Y" }}</h4>
+  
+  <h4>Giám thị:
+  	<h5>
+  	{% for gt in khthi.ds_giamthi.all %}
+  		 {{ forloop.counter }}. {{ gt.ho_ten }} <br />
+  	{% empty %}
+  		<li>Không có giám thị</li>
+  	{% endfor %}
+  	</h5>
+  </h4>
+  <table>
+  	<tr>
+  		<th scope="col">STT</th>
+  		<th scope="col">Mã SV</th>
+  		<th scope="col">Họ tên</th>
+  		<th scope="col">Lớp</th>
+  		<th scope="col">Đối tượng</th>
+  		<th scope="col">Trạng thái</th>
+  		<th scope="col">Thời gian đăng nhập</th>
+  	</tr>
+  	
+	{% for thisinh in ds_thisinh %}
+  	<tr>
+  		<td align="center"> {{ forloop.counter }}</td>
+  		<td align="center">{{thisinh.ma_sv}}</td>
+  		<td>{{thisinh.ho_ten}}</td>
+  		<td>{{thisinh.lop.ten_lop}}</td>
+  		<td>{{thisinh.lop.doi_tuong.ten_dt}}</td>
+  		{% for loggin_user in logged_in_users %}
+  			{% if thisinh.ma_sv == loggin_user.username %}
+	  			<td align="center" bgcolor="red" >Đã đăng nhập</a></td>
+  			{% else %}
+  				<td align="center">Chưa đăng nhập</a></td>
+  			{% endif %}
+  		{% endfor %}
+  		
+  		<td align="center">PDF</td>
+  	</tr>
+	
+	{% empty %}
+  		<li>Chưa có đề thi</li>	
+	{% endfor %}
+  </table> 
+</div>
+
+
+
+{% endblock %}

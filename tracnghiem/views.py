@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 
 from django.http import HttpResponse
 from django.contrib.auth.views import logout
@@ -10,7 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from datetime import datetime
 from tracnghiem.models import LogSinhDe, NganHangDe, Question, Answer, KHThi,\
-    BaiThi
+    BaiThi, LoggedUser
 import json
 from django.views.generic.detail import DetailView
 from _io import BytesIO
@@ -20,8 +21,9 @@ from tracnghiem.util import export_pdf
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
-def login_user(request):
-    logout(request)
+def user_login(request):
+    if request.user:
+        logout(request)
     username = password = ''
     
 #     ds_mothi = MonThi.objects.all();
@@ -41,13 +43,39 @@ def login_user(request):
          
         if user is not None:
             login(request, user)
-            
-            baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)[0]
-            return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
+            if username.startswith('GV'):
+                khthi = KHThi.objects.get(pk=cathi_id)
+                ds_giamthi = khthi.ds_giamthi.all()
+                for giamthi in ds_giamthi:
+                    if giamthi.user.id == user.id:
+                        return HttpResponseRedirect('/hvhc/tracnghiem/khthi/theodoithi/'+str(khthi.id) + '/')
+            else:
+                baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)[0]
+                return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
          
     return HttpResponse(template.render(context))
 
-def quiz_finish(request, pk):
+def theodoithi(request, pk):
+    khthi = KHThi.objects.get(pk=pk)
+    ds_thisinh = khthi.ds_thisinh.all()
+    login_users = LoggedUser.objects.all()
+    logged_in_users = [u for u in login_users if check_login_user(u, ds_thisinh)]
+    template = loader.get_template('theodoithi.html')
+    context = RequestContext(request, {
+        'khthi': khthi,
+        'ds_thisinh': ds_thisinh,
+        'logged_in_users': logged_in_users,
+        
+    })
+    return HttpResponse(template.render(context))
+
+def check_login_user(user, ds_thisinh):
+    for thisinh in ds_thisinh:
+        if thisinh.ma_sv == user.username:
+            return True
+    return False
+
+def baithi_finish(request, pk):
     baithi = BaiThi.objects.get(pk=pk)
         
     answers = {}
@@ -61,6 +89,10 @@ def quiz_finish(request, pk):
                 continue
 
     baithi.save_tralois(answers)
+    for k,v in request.POST.items():
+        if k.startswith('save'):
+            return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.pk) + '/start/#')
+    
     baithi.cham_diem()
     
 #     user = request.user
@@ -143,9 +175,9 @@ def boc_tron_de_thi(request, pk):
     
     succ = khthi.boc_va_tron_de()
     if succ:
-        return HttpResponse("Boc va tron de thanh cong!")
+        return HttpResponseRedirect("/hvhc/tracnghiem/khthi/show/" + str(pk) + "/" )
     else:
-        return HttpResponse("Boc va tron de KHONG thanh cong!")
+        return HttpResponse(u"Bốc và trộn đề thi KHÔNG thành công! Kiểm tra lại cấu hình sinh đề thi.")
     
 def khthi_show(request, pk):
     khthi = KHThi.objects.get(pk=pk)

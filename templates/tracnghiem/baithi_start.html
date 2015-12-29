@@ -20,7 +20,7 @@ Làm bài thi
   <h4>Thời gian bắt đầu: {{ object.khthi.tg_bat_dau|time:"H:i" }}</h4>
   <h4>Thời gian kết thúc: {{ object.khthi.tg_ket_thuc|time:"H:i" }}</h4>
   
-  <form action="../finish/" method="POST">
+  <form action="../finish/" method="post">
   	{% csrf_token %}
 	{% for q, answers in questions %}
 		<div class="question">
@@ -28,8 +28,8 @@ Làm bài thi
 		<h4>Câu {{forloop.counter}}: {{ q.noiDung }}</h5>
 		
 		{% for a in answers %}
-			{% if a.id in traloi %}			
-				<input type="radio" name="{{ q.id }}" value="{{ a.id }} checked"> {{ a.dapAn }} </input>
+			{% if a.pk in traloi %}			
+				<input type="radio" name="{{ q.id }}" value="{{ a.id }}" checked="checked"> {{ a.dapAn }} </input>
 			
 			{% else %}
 			
@@ -39,7 +39,7 @@ Làm bài thi
 			<br />
 		{% empty %}
 		{% endfor %}
-			<input type="button" value="Lưu"></input>
+			<input type = "submit" name="save{{forloop.counter}}" value="Lưu"/>
 		</div>
 		
 	{% empty %}
@@ -47,13 +47,26 @@ Làm bài thi
 	{% endfor %}
 	
 	<br />
- 	<input class="btn btn-primary btn-lg" type = "submit" name="hoanthanh" value="Hoàn thành" />
+ 	<input class="btn btn-primary btn-lg" type = "submit" name="finish" value="Hoàn thành"/>
   
   </form>
   
 
 </div>
 
+<script>
+window.onbeforeunload = function (e) {
+    var e = e || window.event;
+    var msg = "Do you really want to leave this page?"
 
+    // For IE and Firefox
+    if (e) {
+        e.returnValue = msg;
+    }
+
+    // For Safari / chrome
+    return msg;
+ };
+</script>
 
 {% endblock %}
