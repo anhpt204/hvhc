@@ -1,7 +1,20 @@
 .dsthisinh table {
 	border-color: black;
 	border-width: medium;
-	
+	width:100%;
+	border :2;
+}
+
+.dsthisinh th, td {
+	padding:7px 10px 10px 10px;
+}
+
+.dsthisinh tr {
+	border-bottom: 1px solid black;
+}
+
+.dsthisinh th {
+	border-bottom: 2px solid red;
 }
 
 

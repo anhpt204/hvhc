@@ -41,14 +41,14 @@ Danh sách thí sinh
   	
 	{% for bt,noidung in ds_baithi.items %}
   	<tr>
-  		<td> {{ forloop.counter }}</td>
-  		<td>{{bt.thi_sinh.ma_sv}}</td>
+  		<td align="center"> {{ forloop.counter }}</td>
+  		<td align="center">{{bt.thi_sinh.ma_sv}}</td>
   		<td>{{bt.thi_sinh.ho_ten}}</td>
   		<td>{{bt.thi_sinh.lop.ten_lop}}</td>
   		<td>{{bt.thi_sinh.lop.doi_tuong.ten_dt}}</td>
-  		<td><a href="export/{{ bt.id }}/">PDF</a></td>
-  		<td>PDF</td>
-  		<td>PDF</td>  		
+  		<td align="center"><a href="export/{{ bt.id }}/">PDF</a></td>
+  		<td align="center">PDF</td>
+  		<td align="center">PDF</td>  		
   	</tr>
 	
 	{% empty %}
