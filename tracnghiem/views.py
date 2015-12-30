@@ -59,21 +59,30 @@ def theodoithi(request, pk):
     khthi = KHThi.objects.get(pk=pk)
     ds_thisinh = khthi.ds_thisinh.all()
     login_users = LoggedUser.objects.all()
-    logged_in_users = [u for u in login_users if check_login_user(u, ds_thisinh)]
+    
+#     print login_users
+    
+    ds_thisinh_info = []
+    for thisinh in ds_thisinh:
+        logged_in, login_time = check_login_user(thisinh, login_users)
+        ds_thisinh_info.append([thisinh, logged_in, login_time])
+    
+    print ds_thisinh_info
+    
     template = loader.get_template('theodoithi.html')
     context = RequestContext(request, {
         'khthi': khthi,
-        'ds_thisinh': ds_thisinh,
-        'logged_in_users': logged_in_users,
-        
+        'ds_thisinh': ds_thisinh_info,
     })
     return HttpResponse(template.render(context))
 
-def check_login_user(user, ds_thisinh):
-    for thisinh in ds_thisinh:
-        if thisinh.ma_sv == user.username:
-            return True
-    return False
+def check_login_user(thisinh, loggedin_users):
+    for u in loggedin_users:
+        print thisinh.ma_sv, u.username, u.login_time    
+        if thisinh.user.username == u.username.strip():
+            print 'OK'          
+            return True, u.login_time
+    return False, None
 
 def baithi_finish(request, pk):
     baithi = BaiThi.objects.get(pk=pk)

@@ -569,7 +569,7 @@ class LoggedUser(models.Model):
         return self.username
 
 def login_user(sender, request, user, **kwargs):
-    LoggedUser(username=user.username).save()
+    LoggedUser(username=user.username, login_time=timezone.now()).save()
 
 def logout_user(sender, request, user, **kwargs):
     if not user:

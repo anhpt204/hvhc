@@ -11,7 +11,10 @@ Danh sách thí sinh
 
 {% block content %}
 <div class="dsthisinh">
-  <h1>{{ khthi.ten }}</h1>
+  <fieldset>
+  <legend>
+  	<h1>{{ khthi.ten }}</h1>
+  </legend>
   <h4>Năm học: {{ khthi.nam_hoc }}</h4>
   <h4>Học kỳ: {{ khthi.hoc_ky }}</h4>
   
@@ -27,6 +30,8 @@ Danh sách thí sinh
   	{% endfor %}
   	</h5>
   </h4>
+  </fieldset>
+
   <table>
   	<tr>
   		<th scope="col">STT</th>
@@ -38,22 +43,21 @@ Danh sách thí sinh
   		<th scope="col">Thời gian đăng nhập</th>
   	</tr>
   	
-	{% for thisinh in ds_thisinh %}
+	{% for thisinh, logged_in, login_time in ds_thisinh %}
   	<tr>
   		<td align="center"> {{ forloop.counter }}</td>
   		<td align="center">{{thisinh.ma_sv}}</td>
   		<td>{{thisinh.ho_ten}}</td>
   		<td>{{thisinh.lop.ten_lop}}</td>
   		<td>{{thisinh.lop.doi_tuong.ten_dt}}</td>
-  		{% for loggin_user in logged_in_users %}
-  			{% if thisinh.ma_sv == loggin_user.username %}
-	  			<td align="center" bgcolor="red" >Đã đăng nhập</a></td>
-  			{% else %}
-  				<td align="center">Chưa đăng nhập</a></td>
-  			{% endif %}
-  		{% endfor %}
+  		{% if logged_in %}
+	  		<td align="center" bgcolor="red" >Đã đăng nhập</a></td>
+	  		<td align="center">{{ login_time }}</td>	  		
+  		{% else %}
+  			<td align="center">Chưa đăng nhập</a></td>
+	  		<td align="center"></td>
+  		{% endif %}
   		
-  		<td align="center">PDF</td>
   	</tr>
 	
 	{% empty %}
