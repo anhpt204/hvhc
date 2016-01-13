@@ -6,6 +6,23 @@ from tracnghiem.models import Answer, QuestionGroup, MCQuestion, TFQuestion, Sin
 
 from django.contrib import admin
 import json
+# from django.contrib.auth.decorators import permission_required
+from permission.decorators import permission_required
+
+#Override modeladmin
+class MyModelAdmin(admin.ModelAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        if hasattr(self, 'field_permissions'):
+            user = request.user
+            for _field in self.opts.fields:
+                perm = self.field_permissions.get(_field.name)
+                if perm and not user.has_perm(perm):
+                    if self.exclude:
+                        self.exclude.append(_field.name)
+                    else:
+                        self.exclude=[_field.name]
+        return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+    
 
 class AnswerInLine(TabularInline):
     model = Answer
@@ -50,11 +67,11 @@ class QuestionGroupAdmin(ModelAdmin):
 class MCQuestionAdmin(ModelAdmin):
     model=MCQuestion
     
-    list_display = ('maCauHoi', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong', 'prior', 'level')
+    list_display = ('maCauHoi', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong', 'prior', 'diem')
     list_filter = ('monHoc', 'doiTuong')
     fields = ('maCauHoi', 'monHoc', 'doiTuong', 
               'prior', 'thuocChuong', 'taoBoi',
-              'noiDung', 'figure', )#'audio', 'clip'  )
+              'noiDung', 'diem', 'figure', )#'audio', 'clip'  )
 
     search_fields = ('noiDung',)
 #     filter_horizontal = ('ca_thi',)
@@ -119,13 +136,18 @@ class KHThiAdmin(ModelAdmin):
     model=KHThi
     filter_horizontal =('ds_thisinh', 'ds_giamthi')
     list_display = ['ten', 'mon_thi', 'doi_tuong', 'nam_hoc', 'hoc_ky', 
-                    'ngay_thi', 'tg_bat_dau', 'tg_ket_thuc', 'boc_tron_de']
+                    'ngay_thi', 'tg_bat_dau', 'tg_thi', 'trang_thai', 'nguoi_boc_de', 'boc_tron_de']
     
     fields = ['ten', 'mon_thi', 'nam_hoc', 'hoc_ky', 'doi_tuong', 
             'ds_thisinh',
             'ds_giamthi', 
-              'ngay_thi', 'tg_bat_dau', 'tg_ket_thuc']
+              'ngay_thi', 'tg_bat_dau', 'tg_thi', 'trang_thai']
     
+#     field_permissions = {'boc_tron_de':'tracnghiem.khthi.duoc_phep_boc_de',
+# #                          'in_de':'khthi.duoc_phep_xem_va_in_de'
+#                         }
+    
+#     @permission_required('tracnghiem.khthi.duoc_phep_boc-de')
     def boc_tron_de(self, obj):
         dethi = json.loads(obj.de_thi)
         if len(dethi) == 0:

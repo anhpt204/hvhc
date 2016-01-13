@@ -4,14 +4,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from django.db.models.fields import CharField, TextField, DateField, TimeField,\
-    CommaSeparatedIntegerField, BooleanField, PositiveIntegerField
+    CommaSeparatedIntegerField, BooleanField, PositiveIntegerField, FloatField,\
+    DurationField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
-from hrm.models import SinhVien, GiaoVien
+from hrm.models import GiaoVien
 from random import sample
 from hvhc import MCQUESTION, TFQUESTION, QUESTION_TYPES, ANSWER_ORDER_OPTIONS,\
-    ESSAYQUESTION, HOC_KY, HK1
+    ESSAYQUESTION, HOC_KY, HK1, TRANG_THAI_THI, TRANG_THAI_KHTHI, KHTHI_CHUATHI
 import json
-from daotao.models import Lop, MonThi, DoiTuong
+from daotao.models import Lop, MonThi, DoiTuong, SinhVien
 import random
 from django.utils import timezone
 from django.contrib.auth.signals import user_logged_in, user_logged_out
@@ -124,6 +125,8 @@ class Question(models.Model):
     noiDung = models.TextField(max_length=1000,
                                blank=False,
                                verbose_name='Câu hỏi')
+    
+    diem = FloatField(verbose_name="Điểm", default=1.0)
         
     figure = models.ImageField(upload_to='uploads/figs/%Y/%m/%d',
                                blank=True,
@@ -295,6 +298,12 @@ class LogSinhDe(models.Model):
         configs = self.sinhdeconf_set.all()
         message = 'Successful'
         # sinh tung de thi
+        nhde = NganHangDe.objects.filter(logSinhDe__monHoc=self.monHoc, logSinhDe__doiTuong=self.doiTuong, daDuyet=True)
+        ds_dethi_daco = []
+        for dethi in nhde:
+            qs = [int(q_id) for q_id in dethi.questions.split(',')]
+            ds_dethi_daco.append(set(qs))
+            
         for _ in xrange(self.soLuong):
             ds_cauhoi = []
             # lay cau hoi cho tung cau hinh
@@ -308,8 +317,19 @@ class LogSinhDe(models.Model):
                     return False, message
                 
                 else:
-                    ds_cauhoi += random.sample(qs, config.soLuong)
+                    while True:
+                        ds_cauhoi += random.sample(qs, config.soLuong)
+                        ds_cauhoi_id = [q.id for q in ds_cauhoi]
+                        set_cauhoi = set(ds_cauhoi_id)
                     
+                        # check trung voi de trong ngan hang da co
+                        ok = False
+                        for dethi in ds_dethi_daco:
+                            if len(set_cauhoi.difference()) > 0:
+                                ok = True
+                                break
+                        if ok:
+                            break
             # make new NganHangDe and add these questions in to 
             nh = NganHangDe()
             nh.logSinhDe = self
@@ -391,9 +411,10 @@ class KHThi(models.Model):
                                 verbose_name=u'Danh sách thí sinh')
 #     ds_thisinh.help_text = u'Tìm kiếm theo họ tên sinh viên hoặc mã lớp.'
     
-    ngay_thi = DateField(verbose_name="Ngày thi")
-    tg_bat_dau=TimeField(verbose_name="Thời gian bắt đầu")
-    tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
+    ngay_thi = DateField(verbose_name="Ngày thi", default=timezone.now)
+    tg_bat_dau=TimeField(verbose_name="Thời gian bắt đầu", default=timezone.now)
+#     tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
+    tg_thi = PositiveIntegerField(verbose_name="Thời gian thi (phút)", default=30, help_text="Nhập thời gian thi tính bằng đơn vị phút")
     
     de_thi_id = PositiveIntegerField(null=True)
     
@@ -409,9 +430,15 @@ class KHThi(models.Model):
     so_luong_de.help_text = u'Nhập giá trị >= 0, nhập 0 sẽ sinh mỗi sinh viên một đề'
     ghichu=TextField(verbose_name="Ghi chú", blank=True, null=True)
     
+    nguoi_boc_de = ForeignKey(GiaoVien, verbose_name="Người bốc đề")
+    trang_thai =  CharField(max_length=30, null=True, blank=True,
+        choices=TRANG_THAI_KHTHI, default=KHTHI_CHUATHI, verbose_name='Trạng thái')
+    
     class Meta:
         verbose_name = u"Kế hoạch thi - bốc đề"
         verbose_name_plural = u"Kế hoạch thi - bốc đề"
+#         permissions = (('duoc_phep_boc_de', 'Người dùng được phép bốc đề'),
+#                        ('duoc_phep_xem_va_in_de', 'Người dùng được phép xem và in đề'),)
 
     def __unicode__(self):
         return u'%s' %(self.ten)
@@ -444,13 +471,16 @@ class KHThi(models.Model):
         self.save()
         
         # tron de cho tung sinh vien tham gia
-        # delete old records if have the same thi_sinh and khthi
+        # delete old records for this khthi
+        bts = BaiThi.objects.filter(khthi=self)
+        for bt in bts:
+            bt.delete()
+            
         ds_thisinh = self.ds_thisinh.all()
         for sv in ds_thisinh:
-            bts = BaiThi.objects.filter(khthi = self).filter(thi_sinh=sv)
-            for bt in bts:
-                bt.delete()
-
+#             bts = BaiThi.objects.filter(khthi = self).filter(thi_sinh=sv)
+#             for bt in bts:
+#                 bt.delete()
             bai_thi = BaiThi()
             bai_thi.khthi = self
             bai_thi.thi_sinh = sv 
@@ -496,6 +526,7 @@ class BaiThi(models.Model):
     ds_cauhoi = TextField(default={})
     tra_loi = TextField(default={})
     diem = PositiveIntegerField(verbose_name="Điểm")
+    is_finished = BooleanField(default=False, verbose_name="Hoàn thành")
     
     
     
@@ -517,7 +548,11 @@ class BaiThi(models.Model):
                 
         self.diem = so_cau_dung
         self.save()
-        
+    
+    def finish(self):
+        self.is_finished = True
+        self.save()
+         
     def get_ds_cauhoi(self):
         '''
         return [[cau_hoi,[pa1, pa2, pa3, pa4]], ....[..]]

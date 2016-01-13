@@ -1,4 +1,5 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="refresh" content="30" />
 
 {% extends 'base.html' %}
 
@@ -19,7 +20,8 @@ Danh sách thí sinh
   <h4>Học kỳ: {{ khthi.hoc_ky }}</h4>
   
   <h4>Môn thi: {{ khthi.mon_thi }}</h4>
-  <h4>Ngày thi: {{ object.ngay_thi|date:"d/m/Y" }}</h4>
+  <h4>Ngày thi: {{ khthi.ngay_thi|date:"d / m / Y" }}</h4>
+  <h4>Thời gian thi: {{khthi.tg_thi}}</h4>
   
   <h4>Giám thị:
   	<h5>
@@ -64,6 +66,19 @@ Danh sách thí sinh
   		<li>Chưa có đề thi</li>	
 	{% endfor %}
   </table> 
+  <br />
+	{% ifequal khthi.trang_thai khthi_chuathi %}
+  <form action="batdau/">
+  	<input type="submit" value="Bắt đầu thi">
+  	</form>
+  	{% endifequal %}
+  	
+	{% ifequal khthi.trang_thai khthi_dangthi %}
+  <form action="ketthuc/">
+  	<input type="submit" value="Kết thúc">
+  </form>
+  	{% endifequal %}
+  	
 </div>
 
 

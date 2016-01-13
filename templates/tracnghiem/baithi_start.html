@@ -15,10 +15,9 @@ Làm bài thi
   
   <h4>Môn thi: {{ object.khthi.mon_thi }}</h4>
   <h4>Họ tên: {{ object.thi_sinh.ho_ten }}</h4>
-  <h4>Lớp: {{ object.khthi.lop_thi }}</h4>
   <h4>Ngày: {{ object.khthi.ngay_thi|date:"d/m/Y" }}</h4>
   <h4>Thời gian bắt đầu: {{ object.khthi.tg_bat_dau|time:"H:i" }}</h4>
-  <h4>Thời gian kết thúc: {{ object.khthi.tg_ket_thuc|time:"H:i" }}</h4>
+  <h4>Thời gian kết thúc: {{ object.khthi.tg_thi}}</h4>
   
   <form action="../finish/" method="post">
   	{% csrf_token %}
@@ -47,7 +46,7 @@ Làm bài thi
 	{% endfor %}
 	
 	<br />
- 	<input class="btn btn-primary btn-lg" type = "submit" name="finish" value="Hoàn thành"/>
+ 	<input class="btn btn-primary btn-lg" type = "submit" name="finish" value="Hoàn thành" onclick="finishBaiThi();"/>
   
   </form>
   

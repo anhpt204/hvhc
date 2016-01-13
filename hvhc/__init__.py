@@ -12,6 +12,10 @@ ESSAYQUESTION='ESSAY'
 HK1 = 'HK1'
 HK2 = 'HK2'
 
+KHTHI_CHUATHI = 'CHUA_THI'
+KHTHI_DANGTHI = 'DANG_THI'
+KHTHI_DATHI = 'DA_THI'
+
 QUESTION_TYPES=(
                (TFQUESTION, 'Câu hỏi Đúng - Sai'),
                (MCQUESTION, 'Câu hỏi Multiple Choice'),
@@ -22,6 +26,11 @@ TRANG_THAI_THI=(
                 ('DA_THI', 'Đã thi'),
                 ('VANG_CO_LD', 'Vắng có lý do'),
                 ('VANG_KO_LD', 'Vắng không lý do'),
+                )
+TRANG_THAI_KHTHI=(
+                (KHTHI_CHUATHI, 'Chưa thi'),
+                (KHTHI_DANGTHI, 'Đang thi'),
+                (KHTHI_DATHI, 'Đã thi'),
                 )
 
 ANSWER_ORDER_OPTIONS = (

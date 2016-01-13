@@ -16,6 +16,10 @@ import json
 from django.views.generic.detail import DetailView
 from _io import BytesIO
 from tracnghiem.util import export_pdf
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from hvhc import KHTHI_DANGTHI, KHTHI_CHUATHI, KHTHI_DATHI
 
 
 def index(request):
@@ -27,8 +31,11 @@ def user_login(request):
     username = password = ''
     
 #     ds_mothi = MonThi.objects.all();
-    today = datetime.now().date()
-    ds_cathi = KHThi.objects.filter(ngay_thi=today)
+    
+    ds_cathi = KHThi.objects.filter(ngay_thi=timezone.now).exclude(trang_thai__exact=KHTHI_DATHI)
+#     ds_cathi = KHThi.objects.all()
+    
+    
     template = loader.get_template('login.html')
     context = RequestContext(request, {
         'ds_cathi': ds_cathi,
@@ -51,7 +58,10 @@ def user_login(request):
                         return HttpResponseRedirect('/hvhc/tracnghiem/khthi/theodoithi/'+str(khthi.id) + '/')
             else:
                 baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)[0]
-                return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
+                if baithi.is_finished:
+                    return HttpResponse('<center><h1>Bài thi đã hoàn thành!</h1></center>')
+                else:
+                    return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
          
     return HttpResponse(template.render(context))
 
@@ -73,18 +83,58 @@ def theodoithi(request, pk):
     context = RequestContext(request, {
         'khthi': khthi,
         'ds_thisinh': ds_thisinh_info,
+        'khthi_chuathi':KHTHI_CHUATHI,
+        'khthi_dangthi':KHTHI_DANGTHI
     })
     return HttpResponse(template.render(context))
 
+def theodoithi_batdau(request, pk):
+    khthi = KHThi.objects.get(pk=pk)
+    khthi.trang_thai = KHTHI_DANGTHI
+    khthi.save()
+    
+    ds_thisinh = khthi.ds_thisinh.all()
+    login_users = LoggedUser.objects.all()
+    
+#     print login_users
+    
+    ds_thisinh_info = []
+    for thisinh in ds_thisinh:
+        logged_in, login_time = check_login_user(thisinh, login_users)
+        ds_thisinh_info.append([thisinh, logged_in, login_time])
+    
+    print ds_thisinh_info
+    
+    template = loader.get_template('theodoithi.html')
+    context = RequestContext(request, {
+        'khthi': khthi,
+        'ds_thisinh': ds_thisinh_info,
+        'khthi_chuathi':KHTHI_CHUATHI,
+        'khthi_dangthi':KHTHI_DANGTHI
+    })
+    return HttpResponse(template.render(context))
+
+def theodoithi_ketthuc(request, pk):
+    khthi = KHThi.objects.get(pk=pk)
+    khthi.trang_thai = KHTHI_DATHI
+    khthi.save()
+    logout(request)
+    
+    return HttpResponse('Bạn đã thoát khỏi hệ thống. Bấm <a href=\'/hvhc/tracnghiem/ \'> VÀO ĐÂY </a> để đăng nhập lại')
+
+
 def check_login_user(thisinh, loggedin_users):
     for u in loggedin_users:
-        print thisinh.ma_sv, u.username, u.login_time    
+#         print thisinh.ma_sv, u.username, u.login_time    
         if thisinh.user.username == u.username.strip():
-            print 'OK'          
+#             print 'OK'          
             return True, u.login_time
     return False, None
 
 def baithi_finish(request, pk):
+    if not request.user.is_authenticated():
+        return  HttpResponseRedirect('/hvhc/tracnghiem/')
+    
     baithi = BaiThi.objects.get(pk=pk)
         
     answers = {}
@@ -103,12 +153,14 @@ def baithi_finish(request, pk):
             return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.pk) + '/start/#')
     
     baithi.cham_diem()
+    baithi.finish()
     
-#     user = request.user
-#     user.logout()
     logout(request)
-    
-    return HttpResponse('Diem = ' + str(baithi.diem))
+    template = loader.get_template('ketqua.html')
+    context = RequestContext(request, {
+        'diem': baithi.diem,
+    })
+    return HttpResponse(template.render(context))
 
 class BaiThiDetailView(DetailView):
     model = BaiThi
@@ -117,8 +169,16 @@ class BaiThiDetailView(DetailView):
     
 #     def get(self, request, *args, **kwargs):
 #         return DetailView.get(self, request, *args, **kwargs)
-
-
+    def get_context_data(self, **kwargs):
+        context = DetailView.get_context_data(self, **kwargs)
+        
+                
+        context['khthi'] = self.object.khthi
+        context['thi_sinh'] = self.object.thi_sinh
+        context['khthi_dangthi'] = KHTHI_DANGTHI
+        
+        return context
+# @login_required
 class BaiThiStartView(DetailView):
     model = BaiThi
     template_name = 'baithi_start.html'

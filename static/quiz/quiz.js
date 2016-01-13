@@ -28,8 +28,8 @@ function saveBaiThi(){
 
 function finishBaiThi(){
 	
-	//alert(window.location.href);
-	var newURL = window.location.href + "finish/";
-	alert(newURL);
-	window.location.href = newURL;
+	alert("Kết thúc bài thi, bạn sẽ không được phép làm lại bài thi này. Bạn muốn kết thúc chứ?");
+//	var newURL = window.location.href + "finish/";
+//	alert(newURL);
+//	window.location.href = newURL;
 }

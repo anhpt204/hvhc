@@ -27,7 +27,7 @@ SECRET_KEY = '!qz9m98#-ub-c(i1ppfol1y*-ia88i!ms0a!yez8)702+w29k2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,11 +41,16 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+	'permission',
+	
     'daotao',
     'hrm',
     'tracnghiem',
     'tuluan',
+)
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # default
+    'permission.backends.PermissionBackend',
 )
 
 MIDDLEWARE_CLASSES = (

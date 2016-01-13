@@ -16,6 +16,7 @@ encoding//tracnghiem/migrations/0014_auto_20151229_1504.py=utf-8
 encoding//tracnghiem/migrations/0015_auto_20151229_1506.py=utf-8
 encoding//tracnghiem/migrations/0017_auto_20151229_1559.py=utf-8
 encoding//tracnghiem/migrations/0018_remove_loggeduser_login_time.py=utf-8
+encoding//tracnghiem/migrations/0022_auto_20160113_0800.py=utf-8
 encoding//tracnghiem/models.py=utf-8
 encoding//tracnghiem/util.py=utf-8
 encoding//tracnghiem/views.py=utf-8
