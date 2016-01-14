@@ -2,12 +2,14 @@
 
 from django.contrib.admin.options import TabularInline, ModelAdmin
 from tracnghiem.models import Answer, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
-    NganHangDe, KHThi, BaiThi
+    NganHangDe, KHThi, BaiThi, ImportMCQuestion, ImportSinhVien
 
 from django.contrib import admin
 import json
 # from django.contrib.auth.decorators import permission_required
 from permission.decorators import permission_required
+from hvhc import PERM_BOC_DE, PERM_XEM_IN_DE
+from daotao.models import SinhVien
 
 #Override modeladmin
 class MyModelAdmin(admin.ModelAdmin):
@@ -135,8 +137,6 @@ class NganHangDeAdmin(ModelAdmin):
 class KHThiAdmin(ModelAdmin):    
     model=KHThi
     filter_horizontal =('ds_thisinh', 'ds_giamthi')
-    list_display = ['ten', 'mon_thi', 'doi_tuong', 'nam_hoc', 'hoc_ky', 
-                    'ngay_thi', 'tg_bat_dau', 'tg_thi', 'trang_thai', 'nguoi_boc_de', 'boc_tron_de']
     
     fields = ['ten', 'mon_thi', 'nam_hoc', 'hoc_ky', 'doi_tuong', 
             'ds_thisinh',
@@ -150,14 +150,62 @@ class KHThiAdmin(ModelAdmin):
 #     @permission_required('tracnghiem.khthi.duoc_phep_boc-de')
     def boc_tron_de(self, obj):
         dethi = json.loads(obj.de_thi)
+        
         if len(dethi) == 0:
             return u'<a href="%s">Bốc đề</a>' % ('/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
         else:
-            return u'<a href="%s">Đã có</a>, <a href="%s">Bốc lại</a>' % ('/hvhc/tracnghiem/khthi/show/'+str(obj.pk)+'/','/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
+            return u'Đã có, <a href="%s">Bốc lại</a>' % ('/hvhc/tracnghiem/khthi/boctrondethi/'+str(obj.pk)+'/')
    
     boc_tron_de.allow_tags=True
     boc_tron_de.short_description="Thực hiện"
     
+    def xem_de(self, obj):
+        dethi = json.loads(obj.de_thi)
+        
+        if len(dethi) == 0:
+            return u'Chưa có'
+        else:
+            return u'<a href="%s">Xem đề</a>' % ('/hvhc/tracnghiem/khthi/show/'+str(obj.pk)+'/')
+   
+    xem_de.allow_tags=True
+    xem_de.short_description="Xem"
+    
+    
+    def get_list_display(self, request):
+        ld = ['ten', 'mon_thi', 'doi_tuong', 'nam_hoc', 'hoc_ky', 
+                    'ngay_thi', 
+                    'tg_bat_dau', 'tg_thi', 'trang_thai', 'nguoi_boc_de']
+
+        allow_boc_de = False
+        allow_xem_de = False
+        
+        perms = request.user.user_permissions.all()
+        for perm in perms:
+            if PERM_BOC_DE == perm.codename:
+                allow_boc_de = True
+                break
+            
+            if perm.codename == PERM_XEM_IN_DE:
+                allow_xem_de = True
+                break
+            
+        for group in request.user.groups.all():
+            perms = group.permissions.all()
+            for perm in perms:
+                if PERM_BOC_DE == perm.codename:
+                    allow_boc_de = True
+                    break
+            
+                if perm.codename == PERM_XEM_IN_DE:
+                    allow_xem_de = True
+                    break
+        if allow_boc_de:
+            ld.append('boc_tron_de')
+        if allow_xem_de:
+            ld.append('xem_de')        
+        return ld
+
+#         return ModelAdmin.get_list_display(self, request)
 class DiemAdmin(ModelAdmin):
     model = BaiThi
     list_display = ['get_ma_sv', 'get_ho_ten', 'get_lop', 'get_mon_thi', 'diem']
@@ -178,6 +226,21 @@ class DiemAdmin(ModelAdmin):
         return obj.khthi.mon_thi
     get_mon_thi.short_description='Môn thi'
         
+class ImportMCQuestionAdmin(ModelAdmin):
+    model = ImportMCQuestion
+    list_display=['mon_thi', 'doi_tuong', 'khoa', 'import_file', 'import_data']
+    
+    def import_data(self, obj):
+#         obj.import_data()
+        return u'<a href="%s">Import</a>' % ('/hvhc/tracnghiem/import/mc/'+str(obj.pk)+'/')
+   
+    import_data.allow_tags=True
+    import_data.short_description="Import"
+    
+class ImportSinhVienAdmin(ModelAdmin):
+    model = ImportSinhVien
+    list_display=['lop', 'import_file']
+    
 admin.site.register(LogSinhDe, LogSinhDeAdmin)
 admin.site.register(NganHangDe, NganHangDeAdmin)
 admin.site.register(QuestionGroup, QuestionGroupAdmin)
@@ -185,3 +248,5 @@ admin.site.register(MCQuestion, MCQuestionAdmin)
 admin.site.register(TFQuestion, TFQuestionAdmin)
 admin.site.register(KHThi, KHThiAdmin)
 admin.site.register(BaiThi, DiemAdmin)
+admin.site.register(ImportMCQuestion, ImportMCQuestionAdmin)
+admin.site.register(ImportSinhVien, ImportSinhVienAdmin)

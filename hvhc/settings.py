@@ -41,7 +41,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'permission',
+# 	'permission',
+
+	'import_export',
 	
     'daotao',
     'hrm',

@@ -16,6 +16,9 @@ KHTHI_CHUATHI = 'CHUA_THI'
 KHTHI_DANGTHI = 'DANG_THI'
 KHTHI_DATHI = 'DA_THI'
 
+PERM_BOC_DE = 'duoc_phep_boc_de'
+PERM_XEM_IN_DE = 'duoc_phep_xem_va_in_de'
+
 QUESTION_TYPES=(
                (TFQUESTION, 'Câu hỏi Đúng - Sai'),
                (MCQUESTION, 'Câu hỏi Multiple Choice'),

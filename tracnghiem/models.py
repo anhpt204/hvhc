@@ -7,15 +7,17 @@ from django.db.models.fields import CharField, TextField, DateField, TimeField,\
     CommaSeparatedIntegerField, BooleanField, PositiveIntegerField, FloatField,\
     DurationField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
-from hrm.models import GiaoVien
+from hrm.models import GiaoVien, DonVi
 from random import sample
 from hvhc import MCQUESTION, TFQUESTION, QUESTION_TYPES, ANSWER_ORDER_OPTIONS,\
-    ESSAYQUESTION, HOC_KY, HK1, TRANG_THAI_THI, TRANG_THAI_KHTHI, KHTHI_CHUATHI
+    ESSAYQUESTION, HOC_KY, HK1, TRANG_THAI_THI, TRANG_THAI_KHTHI, KHTHI_CHUATHI,\
+    PERM_BOC_DE, PERM_XEM_IN_DE
 import json
 from daotao.models import Lop, MonThi, DoiTuong, SinhVien
 import random
 from django.utils import timezone
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from openpyxl.reader.excel import load_workbook
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
     name = CharField(verbose_name="Nhóm câu hỏi", 
@@ -437,8 +439,8 @@ class KHThi(models.Model):
     class Meta:
         verbose_name = u"Kế hoạch thi - bốc đề"
         verbose_name_plural = u"Kế hoạch thi - bốc đề"
-#         permissions = (('duoc_phep_boc_de', 'Người dùng được phép bốc đề'),
-#                        ('duoc_phep_xem_va_in_de', 'Người dùng được phép xem và in đề'),)
+        permissions = ((PERM_BOC_DE, 'Người dùng được phép bốc đề'),
+                        (PERM_XEM_IN_DE, 'Người dùng được phép xem và in đề'),)
 
     def __unicode__(self):
         return u'%s' %(self.ten)
@@ -602,6 +604,46 @@ class LoggedUser(models.Model):
   
     def __unicode__(self):
         return self.username
+    
+class ImportMCQuestion(models.Model):
+    '''
+    The hien cho 1 de thi tu luan
+    '''
+    mon_thi = models.ForeignKey(MonThi,
+                                  verbose_name="Môn thi")
+    
+    doi_tuong = models.ForeignKey(DoiTuong, verbose_name="Đối tượng")
+    
+    khoa = models.ForeignKey(DonVi, verbose_name="Khoa")
+    import_file = models.FileField(upload_to='tmp',
+                               blank=True,
+                               null=True,
+                               verbose_name=("Chọn file dữ liệu"))
+    class Meta:
+        verbose_name = u'Nhập danh sách câu hỏi Multiple Choice từ file'
+        verbose_name_plural = u"Nhập danh sách câu hỏi Multiple Choice từ file"
+        
+    def import_data(self):
+        wb = load_workbook(filename=self.import_file.path)
+        ws = wb.active
+        print ws['A2']
+        
+        
+        
+class ImportSinhVien(models.Model):
+    '''
+    The hien cho 1 de thi tu luan
+    '''
+    lop = models.ForeignKey(Lop,
+                                  verbose_name="Lớp")
+    
+    import_file = models.FileField(upload_to='tmp',
+                               blank=True,
+                               null=True,
+                               verbose_name=("Chọn file dữ liệu"))
+    class Meta:
+        verbose_name = u'Nhập danh sách sinh viên từ file'
+        verbose_name_plural = u"Nhập danh sách sinh viên từ file"
 
 def login_user(sender, request, user, **kwargs):
     LoggedUser(username=user.username, login_time=timezone.now()).save()

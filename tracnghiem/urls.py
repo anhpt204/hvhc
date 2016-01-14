@@ -9,6 +9,8 @@ urlpatterns = [
     
     url(r'^baithi/(?P<pk>[\d]+)/$', BaiThiDetailView.as_view(), name="baithi_detail"),
     url(r'^baithi/(?P<pk>[\d]+)/start/$', BaiThiStartView.as_view(), name='baithi_start'),
+    url(r'^baithi/(?P<pk>[\d]+)/start/save/(?P<cau>[\d]+)/$', views.baithi_save, name='baithi_save'),
+    
     url(r'^baithi/(?P<pk>[\d]+)/finish/$', views.baithi_finish, name='baithi_finish'),
 #     url(r'^baithi/(?P<pk>[\d]+)/start/save/$', views.baithi_save, name='baithi_save'),
     
@@ -25,5 +27,7 @@ urlpatterns = [
     url(r'^khthi/theodoithi/(?P<pk>[\d]+)/batdau/ketthuc/$', views.theodoithi_ketthuc, name="theodoithi_batdau"),
         
     url(r'^ketqua/$', views.theodoithi, name="giam thi theo doi thi"),
+    
+    url(r'^import/mc/(?P<pk>[\d]+)/$', views.import_mcquestion, name='import mcquestion data'),
     
 ]

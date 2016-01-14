@@ -11,21 +11,30 @@ Làm bài thi
 
 {% block content %}
 <div class="jumbotron">
+
+  <div class="floating-timer">
+    <label id="remaining_time">{{object.khthi.tg_thi}}</label>
+  </div>
+
+	<div class="floating-div">
+
   <h1>{{ object.khthi.ten }}</h1>
   
   <h4>Môn thi: {{ object.khthi.mon_thi }}</h4>
   <h4>Họ tên: {{ object.thi_sinh.ho_ten }}</h4>
   <h4>Ngày: {{ object.khthi.ngay_thi|date:"d/m/Y" }}</h4>
   <h4>Thời gian bắt đầu: {{ object.khthi.tg_bat_dau|time:"H:i" }}</h4>
-  <h4>Thời gian kết thúc: {{ object.khthi.tg_thi}}</h4>
+  <h4>Thời gian thi: {{ object.khthi.tg_thi}}</h4>
+  <h4>Số câu đã trả lời: {{socaudatraloi}} / {{soluongcauhoi}}</h4>
+  </div>
   
   <form action="../finish/" method="post">
+<!--   <form id="question_form" method="post"></form> -->
   	{% csrf_token %}
 	{% for q, answers in questions %}
 		<div class="question">
 		<hr />
-		<h4>Câu {{forloop.counter}}: {{ q.noiDung }}</h5>
-		
+		<h4 id="cau_{{forloop.counter}}">Câu {{forloop.counter}}: {{ q.noiDung }}</h5>
 		{% for a in answers %}
 			{% if a.pk in traloi %}			
 				<input type="radio" name="{{ q.id }}" value="{{ a.id }}" checked="checked"> {{ a.dapAn }} </input>
@@ -38,7 +47,8 @@ Làm bài thi
 			<br />
 		{% empty %}
 		{% endfor %}
-			<input type = "submit" name="save{{forloop.counter}}" value="Lưu"/>
+			<input type = "submit" name="" value="Lưu" formaction="save/{{forloop.counter}}/"/>
+<!-- 			<a href="save/{{forloop.counter}}/">Lưu</a> -->
 		</div>
 		
 	{% empty %}
@@ -46,10 +56,17 @@ Làm bài thi
 	{% endfor %}
 	
 	<br />
- 	<input class="btn btn-primary btn-lg" type = "submit" name="finish" value="Hoàn thành" onclick="finishBaiThi();"/>
+ 	<input class="btn btn-primary btn-lg" 
+ 	type = "submit" name="finish" value="Hoàn thành" onclick="finishBaiThi();"
+ 	/>
   
   </form>
   
+  <div class="question-list">
+	{% for q, answers in questions %}
+		<a href="#cau_{{forloop.counter}}" >Câu {{ forloop.counter }}</a><br>
+	{% endfor %}
+  </div>
 
 </div>
 
@@ -66,6 +83,14 @@ window.onbeforeunload = function (e) {
     // For Safari / chrome
     return msg;
  };
+ 
+ var myVar = setInterval(myTimer, 1000);
+ function myTimer() {
+     //var d = new Date();
+     var t = document.getElementById("remaining_time").innerHTML;
+     t = parseInt(t) - 1;
+     document.getElementById("remaining_time").innerHTML = t.toString();
+ }
 </script>
 
 {% endblock %}

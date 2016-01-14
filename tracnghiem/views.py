@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from datetime import datetime
 from tracnghiem.models import LogSinhDe, NganHangDe, Question, Answer, KHThi,\
-    BaiThi, LoggedUser
+    BaiThi, LoggedUser, ImportMCQuestion
 import json
 from django.views.generic.detail import DetailView
 from _io import BytesIO
@@ -58,7 +58,7 @@ def user_login(request):
                         return HttpResponseRedirect('/hvhc/tracnghiem/khthi/theodoithi/'+str(khthi.id) + '/')
             else:
                 baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)[0]
-                if baithi.is_finished:
+                if baithi.khthi.trang_thai==KHTHI_DATHI:
                     return HttpResponse('<center><h1>Bài thi đã hoàn thành!</h1></center>')
                 else:
                     return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
@@ -148,9 +148,6 @@ def baithi_finish(request, pk):
                 continue
 
     baithi.save_tralois(answers)
-    for k,v in request.POST.items():
-        if k.startswith('save'):
-            return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.pk) + '/start/#')
     
     baithi.cham_diem()
     baithi.finish()
@@ -161,6 +158,26 @@ def baithi_finish(request, pk):
         'diem': baithi.diem,
     })
     return HttpResponse(template.render(context))
+
+def baithi_save(request, pk, cau):
+    if not request.user.is_authenticated():
+        return  HttpResponseRedirect('/hvhc/tracnghiem/')
+    
+    baithi = BaiThi.objects.get(pk=pk)
+        
+    answers = {}
+    
+    if request.POST:
+        questions = json.loads(baithi.ds_cauhoi)
+        for q_id,_ in questions:
+            try:
+                answers[q_id] = int(request.POST[q_id])
+            except:
+                continue
+
+    baithi.save_tralois(answers)
+
+    return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.pk) + '/start/#cau_'+str(cau))
 
 class BaiThiDetailView(DetailView):
     model = BaiThi
@@ -194,6 +211,8 @@ class BaiThiStartView(DetailView):
                 
         context['questions'] = self.object.get_ds_cauhoi()
         context['traloi'] = self.object.get_traloi().values()
+        context['socaudatraloi'] = len(self.object.get_traloi())
+        context['soluongcauhoi'] = len(self.object.get_ds_cauhoi())
         
         return context
     
@@ -243,8 +262,10 @@ def boc_tron_de_thi(request, pk):
     khthi = KHThi.objects.get(pk=pk)
     
     succ = khthi.boc_va_tron_de()
+    logout(request)
     if succ:
-        return HttpResponseRedirect("/hvhc/tracnghiem/khthi/show/" + str(pk) + "/" )
+#         return HttpResponseRedirect("/hvhc/tracnghiem/khthi/show/" + str(pk) + "/" )
+        return HttpResponse("Bốc và trộn đề thành công! Bấm <a href=\"/admin\">VÀO ĐÂY</a> để đăng nhập lại vào hệ thống.")
     else:
         return HttpResponse(u"Bốc và trộn đề thi KHÔNG thành công! Kiểm tra lại cấu hình sinh đề thi.")
     
@@ -259,3 +280,9 @@ def khthi_show(request, pk):
     })
     
     return HttpResponse(template.render(context))
+
+
+def import_mcquestion(request, pk):
+    import_mcq = ImportMCQuestion.objects.get(pk=pk)
+    import_mcq.import_data()
+    return HttpResponse('OK')
