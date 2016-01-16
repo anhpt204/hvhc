@@ -228,7 +228,7 @@ class DiemAdmin(ModelAdmin):
         
 class ImportMCQuestionAdmin(ModelAdmin):
     model = ImportMCQuestion
-    list_display=['mon_thi', 'doi_tuong', 'khoa', 'import_file', 'import_data']
+    list_display=['mon_thi', 'doi_tuong', 'import_file', 'import_data']
     
     def import_data(self, obj):
 #         obj.import_data()

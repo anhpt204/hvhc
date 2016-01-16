@@ -100,7 +100,7 @@ class Question(models.Model):
     base class for all other type of questions
     shared all properties
     '''
-    maCauHoi = CharField(max_length=20, verbose_name="Mã câu hỏi")
+    maCauHoi = CharField(max_length=20, verbose_name="Mã câu hỏi", unique=True)
     
     monHoc = ForeignKey(MonThi,
                          blank=False, null=False,
@@ -614,7 +614,7 @@ class ImportMCQuestion(models.Model):
     
     doi_tuong = models.ForeignKey(DoiTuong, verbose_name="Đối tượng")
     
-    khoa = models.ForeignKey(DonVi, verbose_name="Khoa")
+#     khoa = models.ForeignKey(DonVi, verbose_name="Khoa")
     import_file = models.FileField(upload_to='tmp',
                                blank=True,
                                null=True,
@@ -626,9 +626,36 @@ class ImportMCQuestion(models.Model):
     def import_data(self):
         wb = load_workbook(filename=self.import_file.path)
         ws = wb.active
-        print ws['A2']
-        
-        
+        for row in ws.rows[1:]:
+            if row[0].value == None:
+                break
+            
+            try:
+                mcq = MCQuestion()
+                mcq.maCauHoi = row[0].value
+                mcq.noiDung = row[1].value
+                mcq.diem = row[6].value
+                mcq.taoBoi=row[7].value
+                
+                mcq.doiTuong = self.doi_tuong
+                mcq.monHoc = self.mon_thi
+                mcq.level=1
+                mcq.prior=1
+                mcq.loaiCauHoi=MCQUESTION
+                mcq.thuocChuong='1'
+                mcq.save()
+                # for answer
+                for i in xrange(2,6):
+                    if len(row[i].value)==0:
+                        continue
+                    a = Answer()
+                    a.dapAn = row[i].value
+                    a.question = mcq
+                    if i == 2:
+                        a.isCorrect = 1
+                    a.save()
+            except:
+                continue
         
 class ImportSinhVien(models.Model):
     '''
