@@ -43,7 +43,7 @@ Danh sách thí sinh
   	<tr>
   		<td align="center"> {{ forloop.counter }}</td>
   		<td align="center">{{bt.thi_sinh.ma_sv}}</td>
-  		<td>{{bt.thi_sinh.ho_ten}}</td>
+  		<td>{{bt.thi_sinh.get_ho_ten}}</td>
   		<td>{{bt.thi_sinh.lop.ten_lop}}</td>
   		<td>{{bt.thi_sinh.lop.doi_tuong.ten_dt}}</td>
   		<td align="center"><a href="export/{{ bt.id }}/">PDF</a></td>

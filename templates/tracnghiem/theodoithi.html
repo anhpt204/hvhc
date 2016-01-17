@@ -49,7 +49,7 @@ Danh sách thí sinh
   	<tr>
   		<td align="center"> {{ forloop.counter }}</td>
   		<td align="center">{{thisinh.ma_sv}}</td>
-  		<td>{{thisinh.ho_ten}}</td>
+  		<td>{{thisinh.get_ho_ten}}</td>
   		<td>{{thisinh.lop.ten_lop}}</td>
   		<td>{{thisinh.lop.doi_tuong.ten_dt}}</td>
   		{% if logged_in %}

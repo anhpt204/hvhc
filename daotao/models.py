@@ -14,6 +14,7 @@ from django.db.models.fields import CharField, CommaSeparatedIntegerField, Posit
 from hvhc import TRANG_THAI_THI
 from django.contrib.auth.models import User
 from hrm.models import DonVi
+from openpyxl.reader.excel import load_workbook
 
 # from hrm.models import DonVi
 # from hrm.models import SinhVien
@@ -67,12 +68,13 @@ class Lop(models.Model):
     
 class SinhVien(models.Model):
     user = OneToOneField(User)
-    ma_sv=PositiveIntegerField(blank=False, null=False,
+    ma_sv=CharField(max_length=15,
                                unique=True,
                                verbose_name="Mã sinh viên")
-    ho_ten = CharField(blank=False, null=False,
-                       max_length=50,
-                       verbose_name="Họ và tên")
+    ho_dem = CharField(max_length=50,
+                       verbose_name="Họ đệm")
+    ten = CharField(max_length=10, verbose_name="Tên")
+    
     lop = ForeignKey(Lop, blank=False, null=False,
                      verbose_name="Lớp")
     # tam the da, co the can them cac truong khac
@@ -81,9 +83,13 @@ class SinhVien(models.Model):
     class Meta:
         verbose_name = "Sinh viên"
         verbose_name_plural = "Danh sách sinh viên"
+#         order = 'ten'
 
     def __unicode__(self):
-        return u'%s-%s' %(self.ho_ten, self.lop.ma_lop)
+        return u'%s - %s' %(self.get_ho_ten, self.lop.ma_lop)
+    @property
+    def get_ho_ten(self):
+        return '%s %s' %(self.ho_dem.strip(), self.ten.strip())
     
     def save(self, *args, **kwargs):
         '''
@@ -128,4 +134,36 @@ class Diem(models.Model):
         verbose_name = "Điểm"
         verbose_name_plural = "Bảng điểm"
         
+class ImportSinhVien(models.Model):
+    '''
+    The hien cho 1 de thi tu luan
+    '''
+    lop = models.ForeignKey(Lop,
+                                  verbose_name="Lớp")
+    
+    import_file = models.FileField(upload_to='tmp',
+                               blank=True,
+                               null=True,
+                               verbose_name=("Chọn file (.xlsx) dữ liệu"))
+    class Meta:
+        verbose_name = u'Nhập danh sách sinh viên từ file .xlsx'
+        verbose_name_plural = u"Nhập danh sách sinh viên từ file .xlsx"
 
+    def import_data(self):
+        wb = load_workbook(filename=self.import_file.path)
+        ws = wb.active
+        for row in ws.rows[1:]:
+            if row[0].value == None:
+                break
+            
+            try:
+                sv = SinhVien()
+                sv.ma_sv = '%s-%02d' %(self.lop.ma_lop, row[0].value)
+                sv.ho_dem = row[1].value
+                sv.ten = row[2].value
+                sv.lop = self.lop
+                sv.save()
+                
+            except Exception, e:
+                print str(e)
+                continue

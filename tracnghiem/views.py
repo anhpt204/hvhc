@@ -20,6 +20,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from hvhc import KHTHI_DANGTHI, KHTHI_CHUATHI, KHTHI_DATHI
+from hrm.models import GiaoVien
 
 
 def index(request):
@@ -260,8 +261,10 @@ def export_baithi_cauhoi(request, pk):
 
 def boc_tron_de_thi(request, pk):
     khthi = KHThi.objects.get(pk=pk)
+    # get nguoi boc de
+    nguoi_boc_de = GiaoVien.objects.get(user = request.user)
     
-    succ = khthi.boc_va_tron_de()
+    succ = khthi.boc_va_tron_de(nguoi_boc_de)
     logout(request)
     if succ:
 #         return HttpResponseRedirect("/hvhc/tracnghiem/khthi/show/" + str(pk) + "/" )
@@ -285,4 +288,4 @@ def khthi_show(request, pk):
 def import_mcquestion(request, pk):
     import_mcq = ImportMCQuestion.objects.get(pk=pk)
     import_mcq.import_data()
-    return HttpResponse('OK')
+    return HttpResponse('<h1>Đã cập nhật dữ liệu xong!</h1>')

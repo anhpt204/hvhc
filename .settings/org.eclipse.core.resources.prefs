@@ -2,6 +2,7 @@ eclipse.preferences.version=1
 encoding//daotao/admin.py=utf-8
 encoding//daotao/apps.py=utf-8
 encoding//daotao/models.py=utf-8
+encoding//daotao/views.py=utf-8
 encoding//hrm/admin.py=utf-8
 encoding//hrm/apps.py=utf-8
 encoding//hrm/migrations/0001_initial.py=utf-8

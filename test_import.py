@@ -6,7 +6,7 @@ Created on Jan 14, 2016
 
 from openpyxl import load_workbook
 
-wb = load_workbook('/home/pta/Downloads/de_trac_nghiem_TH.xls.xlsx')
+wb = load_workbook('/home/pta/git/hvhc/media/tmp/de_trac_nghiem_TH.xls.xlsx')
 ws = wb.active
 # print len(ws.columns)
 # print len(ws.rows)

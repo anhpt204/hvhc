@@ -2,7 +2,7 @@
 
 from django.contrib.admin.options import TabularInline, ModelAdmin
 from tracnghiem.models import Answer, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
-    NganHangDe, KHThi, BaiThi, ImportMCQuestion, ImportSinhVien
+    NganHangDe, KHThi, BaiThi, ImportMCQuestion
 
 from django.contrib import admin
 import json
@@ -69,10 +69,10 @@ class QuestionGroupAdmin(ModelAdmin):
 class MCQuestionAdmin(ModelAdmin):
     model=MCQuestion
     
-    list_display = ('maCauHoi', 'monHoc', 'doiTuong', 'noiDung', 'taoBoi', 'thuocChuong', 'prior', 'diem')
+    list_display = ('maCauHoi', 'monHoc', 'doiTuong', 'noiDung', 'thuocChuong', 'prior', 'diem')
     list_filter = ('monHoc', 'doiTuong')
     fields = ('maCauHoi', 'monHoc', 'doiTuong', 
-              'prior', 'thuocChuong', 'taoBoi',
+              'prior', 'thuocChuong', #'taoBoi',
               'noiDung', 'diem', 'figure', )#'audio', 'clip'  )
 
     search_fields = ('noiDung',)
@@ -100,8 +100,8 @@ class LogSinhDeAdmin(ModelAdmin):
     
 class TFQuestionAdmin(ModelAdmin):
     model = TFQuestion
-    list_display = ('monHoc', 'doiTuong', 'noiDung', 'taoBoi')
-    fields = ('monHoc', 'doiTuong', 'prior', 'thuocChuong', 'taoBoi',
+    list_display = ('monHoc', 'doiTuong', 'noiDung')
+    fields = ('monHoc', 'doiTuong', 'prior', 'thuocChuong', 
               'noiDung', 'figure', 'audio', 'clip', 'isTrue' )
     list_filter = ('monHoc',)
     
@@ -237,9 +237,6 @@ class ImportMCQuestionAdmin(ModelAdmin):
     import_data.allow_tags=True
     import_data.short_description="Import"
     
-class ImportSinhVienAdmin(ModelAdmin):
-    model = ImportSinhVien
-    list_display=['lop', 'import_file']
     
 admin.site.register(LogSinhDe, LogSinhDeAdmin)
 admin.site.register(NganHangDe, NganHangDeAdmin)
@@ -249,4 +246,3 @@ admin.site.register(TFQuestion, TFQuestionAdmin)
 admin.site.register(KHThi, KHThiAdmin)
 admin.site.register(BaiThi, DiemAdmin)
 admin.site.register(ImportMCQuestion, ImportMCQuestionAdmin)
-admin.site.register(ImportSinhVien, ImportSinhVienAdmin)

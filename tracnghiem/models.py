@@ -111,8 +111,8 @@ class Question(models.Model):
                               choices=QUESTION_TYPES,
                             default=MCQUESTION,
                             verbose_name="Loại câu hỏi")
-    taoBoi = ForeignKey(GiaoVien,
-                        verbose_name="Người tạo")
+#     taoBoi = ForeignKey(GiaoVien,
+#                         verbose_name="Người tạo")
     
     prior = ForeignKey(QuestionGroup,
                        verbose_name="Nhóm câu hỏi",
@@ -191,7 +191,7 @@ class Answer(models.Model):
                                   verbose_name="Là phương án đúng")
 
     def __unicode__(self):
-        return u'%s' %(self.dapAn)
+        return u'%d' %(self.pk)
 
     class Meta:
         verbose_name = "Phương án trả lời"
@@ -325,9 +325,12 @@ class LogSinhDe(models.Model):
                         set_cauhoi = set(ds_cauhoi_id)
                     
                         # check trung voi de trong ngan hang da co
+                        if len(ds_dethi_daco) == 0:
+                            break
+                        
                         ok = False
                         for dethi in ds_dethi_daco:
-                            if len(set_cauhoi.difference()) > 0:
+                            if len(set_cauhoi.difference(dethi)) > 0:
                                 ok = True
                                 break
                         if ok:
@@ -340,6 +343,7 @@ class LogSinhDe(models.Model):
             nh.questions = ','.join([str(q.pk) for q in ds_cauhoi])
             nh.save()
             nh.maDeThi = "%s%d" %(self.monHoc.ma_mon_thi, nh.pk)
+            print nh.maDeThi
             nh.save()
         return True, message
     
@@ -432,7 +436,7 @@ class KHThi(models.Model):
     so_luong_de.help_text = u'Nhập giá trị >= 0, nhập 0 sẽ sinh mỗi sinh viên một đề'
     ghichu=TextField(verbose_name="Ghi chú", blank=True, null=True)
     
-    nguoi_boc_de = ForeignKey(GiaoVien, verbose_name="Người bốc đề")
+    nguoi_boc_de = ForeignKey(GiaoVien, verbose_name="Người bốc đề", null=True, blank=True)
     trang_thai =  CharField(max_length=30, null=True, blank=True,
         choices=TRANG_THAI_KHTHI, default=KHTHI_CHUATHI, verbose_name='Trạng thái')
     
@@ -445,11 +449,13 @@ class KHThi(models.Model):
     def __unicode__(self):
         return u'%s' %(self.ten)
     
-    def boc_va_tron_de(self):
+    def boc_va_tron_de(self, nguoi_boc_de):
         '''
         Boc de thi trong ngan hang de theo mon hoc va doi tuong.
         Sau khi co de thi, tien hanh tron de thi thanh (soLuong) de
         '''
+        self.nguoi_boc_de = nguoi_boc_de
+        
         ngan_hang_de = NganHangDe.objects.filter(logSinhDe__monHoc=self.mon_thi).filter(logSinhDe__doiTuong=self.doi_tuong).filter(daDuyet=True)
         if len(ngan_hang_de)==0:
             return False
@@ -538,7 +544,7 @@ class BaiThi(models.Model):
         unique_together = ("khthi", "thi_sinh")
         
     def __unicode__(self):
-        return u'%s' %(self.thi_sinh.ho_ten)
+        return u'%s' %(self.thi_sinh.get_ho_ten)
     
     def cham_diem(self):
         tra_loi_dict = json.loads(self.tra_loi)
@@ -635,12 +641,12 @@ class ImportMCQuestion(models.Model):
                 mcq.maCauHoi = row[0].value
                 mcq.noiDung = row[1].value
                 mcq.diem = row[6].value
-                mcq.taoBoi=row[7].value
+#                 mcq.taoBoi=row[7].value
                 
                 mcq.doiTuong = self.doi_tuong
                 mcq.monHoc = self.mon_thi
                 mcq.level=1
-                mcq.prior=1
+                mcq.prior_id=1
                 mcq.loaiCauHoi=MCQUESTION
                 mcq.thuocChuong='1'
                 mcq.save()
@@ -654,23 +660,10 @@ class ImportMCQuestion(models.Model):
                     if i == 2:
                         a.isCorrect = 1
                     a.save()
-            except:
+            except Exception, e:
+                print str(e)
                 continue
         
-class ImportSinhVien(models.Model):
-    '''
-    The hien cho 1 de thi tu luan
-    '''
-    lop = models.ForeignKey(Lop,
-                                  verbose_name="Lớp")
-    
-    import_file = models.FileField(upload_to='tmp',
-                               blank=True,
-                               null=True,
-                               verbose_name=("Chọn file dữ liệu"))
-    class Meta:
-        verbose_name = u'Nhập danh sách sinh viên từ file'
-        verbose_name_plural = u"Nhập danh sách sinh viên từ file"
 
 def login_user(sender, request, user, **kwargs):
     LoggedUser(username=user.username, login_time=timezone.now()).save()

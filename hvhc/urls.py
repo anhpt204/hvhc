@@ -23,5 +23,7 @@ urlpatterns = [
     
     url(r'^hvhc/tracnghiem/', include('tracnghiem.urls')),
     url(r'^hvhc/tuluan/', include('tuluan.urls')),
+    url(r'^hvhc/daotao/', include('daotao.urls')),
+    
     url(r'^hvhc/changepass/$', 'django.contrib.auth.views.password_change'),
 ] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
