@@ -53,14 +53,20 @@ def user_login(request):
             login(request, user)
             if username.startswith('GV'):
                 khthi = KHThi.objects.get(pk=cathi_id)
+                if not khthi:
+                    return HttpResponse('<h1>Tên đăng nhập hoặc mật khẩu sai. Bấm <a href=\"/hvhc/tracnghiem/\">VÀO ĐÂY</a> để đăng nhập lại</h1>')
                 ds_giamthi = khthi.ds_giamthi.all()
                 for giamthi in ds_giamthi:
                     if giamthi.user.id == user.id:
                         return HttpResponseRedirect('/hvhc/tracnghiem/khthi/theodoithi/'+str(khthi.id) + '/')
             else:
-                baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)[0]
-                if baithi.khthi.trang_thai==KHTHI_DATHI:
-                    return HttpResponse('<center><h1>Bài thi đã hoàn thành!</h1></center>')
+                ds_baithi = BaiThi.objects.filter(thi_sinh=username, khthi=cathi_id)
+                if not ds_baithi:
+                    return HttpResponse('<h1>Tên đăng nhập hoặc mật khẩu sai. Bấm <a href=\"/hvhc/tracnghiem/\">VÀO ĐÂY</a> để đăng nhập lại</h1>')
+                
+                baithi = ds_baithi[0]
+                if baithi.khthi.trang_thai==KHTHI_DATHI or baithi.is_finished:
+                    return HttpResponse('<center><h1>Bài thi đã hoàn thành! Điểm bài thi này là: %.1f</h1></center>' %baithi.diem)
                 else:
                     return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(baithi.id) + '/')
          
@@ -92,7 +98,7 @@ def theodoithi(request, pk):
 def theodoithi_batdau(request, pk):
     khthi = KHThi.objects.get(pk=pk)
     khthi.trang_thai = KHTHI_DANGTHI
-    khthi.tg_thi_batdau = timezone.now
+    khthi.tg_thi_batdau = timezone.now().time()
     khthi.save()
     
     ds_thisinh = khthi.ds_thisinh.all()
@@ -205,13 +211,12 @@ class BaiThiStartView(DetailView):
 #     def get(self, request, *args, **kwargs):
 #         object = DetailView.get(self, request, *args, **kwargs)
 #         
-#         context = self.get_context_data(object=self.object)
-        
+#         context = self.get_context_data(object=self.object)        
     def get_context_data(self, **kwargs):
         context = DetailView.get_context_data(self, **kwargs)
         # get remaining time
-        dathi_delta = timezone.now - self.object.khthi.tg_thi_batdau
-        dathi_duration = dathi_delta.seconds/60 -1
+        dathi_duration = timezone.now().hour*60 + timezone.now().minute 
+        dathi_duration = dathi_duration - (self.object.khthi.tg_thi_batdau.hour*60 + self.object.khthi.tg_thi_batdau.minute)
         remaining_time = self.object.khthi.tg_thi - dathi_duration
                 
         context['questions'] = self.object.get_ds_cauhoi()
@@ -220,7 +225,28 @@ class BaiThiStartView(DetailView):
         context['soluongcauhoi'] = len(self.object.get_ds_cauhoi())
         context['remaining_time'] = remaining_time
         return context
+@login_required
+def start_baithi(request, pk):
+    baithi = BaiThi.objects.get(pk=pk)
+    if baithi.khthi.trang_thai != KHTHI_DANGTHI:
+        return HttpResponseRedirect('/hvhc/tracnghiem/baithi/' + str(pk) + '/')
     
+    template = loader.get_template('baithi_start.html')
+
+    dathi_duration = timezone.now().hour*60 + timezone.now().minute 
+    dathi_duration = dathi_duration - baithi.khthi.tg_thi_batdau.hour*60 + baithi.khthi.tg_thi_batdau.minute
+    remaining_time = baithi.khthi.tg_thi - dathi_duration
+    
+    context = RequestContext(request, {
+        'baithi':baithi,
+#         'questions':baithi.get_ds_cauhoi(),
+#         'traloi': baithi.get_traloi().values(),
+#         'socaudatraloi': len(baithi.get_traloi()),
+#         'soluongcauhoi':len(baithi.get_ds_cauhoi()),
+#         'remaining_time': remaining_time
+    })
+    return template.render(context)
+
 def sinhde(request, pk):
     logSinhDe = LogSinhDe.objects.get(pk=pk)
     ok, msg = logSinhDe.sinhDe()

@@ -9,6 +9,7 @@ urlpatterns = [
     
     url(r'^baithi/(?P<pk>[\d]+)/$', BaiThiDetailView.as_view(), name="baithi_detail"),
     url(r'^baithi/(?P<pk>[\d]+)/start/$', BaiThiStartView.as_view(), name='baithi_start'),
+#     url(r'^baithi/(?P<pk>[\d]+)/start/$', views.start_baithi, name='start bai thi'),
     url(r'^baithi/(?P<pk>[\d]+)/start/save/(?P<cau>[\d]+)/$', views.baithi_save, name='baithi_save'),
     
     url(r'^baithi/(?P<pk>[\d]+)/finish/$', views.baithi_finish, name='baithi_finish'),

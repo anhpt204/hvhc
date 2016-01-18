@@ -18,6 +18,7 @@ import random
 from django.utils import timezone
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from openpyxl.reader.excel import load_workbook
+from django.forms.fields import DecimalField
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
     name = CharField(verbose_name="Nhóm câu hỏi", 
@@ -535,7 +536,7 @@ class BaiThi(models.Model):
     thi_sinh = ForeignKey(SinhVien, verbose_name="Sinh viên", to_field='ma_sv')
     ds_cauhoi = TextField(default={})
     tra_loi = TextField(default={})
-    diem = PositiveIntegerField(verbose_name="Điểm")
+    diem = FloatField(verbose_name="Điểm")
     is_finished = BooleanField(default=False, verbose_name="Hoàn thành")
     
     
@@ -551,12 +552,13 @@ class BaiThi(models.Model):
     def cham_diem(self):
         tra_loi_dict = json.loads(self.tra_loi)
         dap_an_dict = json.loads(self.khthi.dap_an)
-        so_cau_dung = 0
+        diem = 0
         for k,v in tra_loi_dict.items():
             if dap_an_dict[k] == v:
-                so_cau_dung += 1
+                q = Question.objects.get(pk=k)
+                diem += q.diem
                 
-        self.diem = so_cau_dung
+        self.diem = diem
         self.save()
     
     def finish(self):

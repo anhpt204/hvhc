@@ -215,7 +215,7 @@ class DiemAdmin(ModelAdmin):
     get_ma_sv.short_description = 'Mã SV'
 
     def get_ho_ten(self, obj):
-        return obj.thi_sinh.ho_ten
+        return '%s %s' %(obj.thi_sinh.ho_dem, obj.thi_sinh.ten)
     get_ho_ten.short_description = 'Họ và tên'
 
     def get_lop(self, obj):

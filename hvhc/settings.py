@@ -113,7 +113,7 @@ Q = 100
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 DATE_INPUT_FORMATS = ("%d/%m/%Y",)
 DATE_FORMAT = ("%d/%m/%Y",)

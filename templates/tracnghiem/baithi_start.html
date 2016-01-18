@@ -18,13 +18,14 @@ Làm bài thi
 
 	<div class="floating-div">
 
-  <h1>{{ object.khthi.ten }}</h1>
+  <h1>{{ baithi.khthi.ten }}</h1>
   
-  <h4>Môn thi: {{ object.khthi.mon_thi }}</h4>
-  <h4>Họ tên: {{ object.thi_sinh }}</h4>
-  <h4>Ngày: {{ object.khthi.ngay_thi|date:"d/m/Y" }}</h4>
-  <h4>Thời gian bắt đầu: {{ object.khthi.tg_bat_dau|time:"H:i" }}</h4>
-  <h4>Thời gian thi: {{ object.khthi.tg_thi}}</h4>
+  <h4>Môn thi: {{ baithi.khthi.mon_thi }}</h4>
+  <h4>Họ tên: {{ baithi.thi_sinh }}</h4>
+  <h4>Ngày: {{ baithi.khthi.ngay_thi|date:"d/m/Y" }}</h4>
+  <h4>Thời gian bắt đầu theo kế hoạch: {{ baithi.khthi.tg_bat_dau|time:"H:i" }}</h4>
+  <h4>Thời gian bắt đầu thực tế: {{ baithi.khthi.tg_thi_batdau|time:"H:i" }}</h4>
+  <h4>Thời gian thi: {{ baithi.khthi.tg_thi}}</h4>
   <h4>Số câu đã trả lời: {{socaudatraloi}} / {{soluongcauhoi}}</h4>
   </div>
   
@@ -71,29 +72,41 @@ Làm bài thi
 </div>
 
 <script>
-window.onbeforeunload = function (e) {
-    var e = e || window.event;
-    var msg = "Do you really want to leave this page?"
+//window.onbeforeunload = function (e) {
+//    var e = e || window.event;
+//    var msg = "Do you really want to leave this page?"
 
     // For IE and Firefox
-    if (e) {
-        e.returnValue = msg;
-    }
+//    if (e) {
+//        e.returnValue = msg;
+//    }
 
     // For Safari / chrome
-    return msg;
- };
+//    return msg;
+// };
  
- var myVar = setInterval(myTimer, 1000);
+ var myVar = setInterval(myTimer, 60000);
  function myTimer() {
      //var d = new Date();
      var t = document.getElementById("remaining_time").innerHTML;
-//     var t = localStorage.getItem("timeRemaining")
-//     if (!t){
-//     	t = t1;
-//     }
-     t = parseInt(t) - 1;
-//     localStorage.setItem("timeRemaining", t);
+     t = parseInt(t);
+	if (t<=0){
+		window.alert("Đã hết thời gian làm bài, bấm vào nút OK để hoàn thành bài thi")
+		var host = window.location.host;
+		var protocol = window.location.protocol;
+		var pathArray = window.location.pathname.split('/');
+		//window.alert(window.location.href)
+		newPathName = "";
+		for(i = 0; i<pathArray.length-2; i++){
+			newPathName += pathArray[i];
+			newPathName += "/";
+		}
+		newPathName += "finish/";
+		newHref = protocol + "//" + host + newPathName;
+		//window.alert(newHref);
+		window.location.href = newHref; 
+	}
+     t = t - 1;
      document.getElementById("remaining_time").innerHTML = t.toString();
  }
 </script>
