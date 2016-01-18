@@ -92,6 +92,7 @@ def theodoithi(request, pk):
 def theodoithi_batdau(request, pk):
     khthi = KHThi.objects.get(pk=pk)
     khthi.trang_thai = KHTHI_DANGTHI
+    khthi.tg_thi_batdau = timezone.now
     khthi.save()
     
     ds_thisinh = khthi.ds_thisinh.all()
@@ -104,7 +105,7 @@ def theodoithi_batdau(request, pk):
         logged_in, login_time = check_login_user(thisinh, login_users)
         ds_thisinh_info.append([thisinh, logged_in, login_time])
     
-    print ds_thisinh_info
+#     print ds_thisinh_info
     
     template = loader.get_template('theodoithi.html')
     context = RequestContext(request, {
@@ -208,13 +209,16 @@ class BaiThiStartView(DetailView):
         
     def get_context_data(self, **kwargs):
         context = DetailView.get_context_data(self, **kwargs)
-        
+        # get remaining time
+        dathi_delta = timezone.now - self.object.khthi.tg_thi_batdau
+        dathi_duration = dathi_delta.seconds/60 -1
+        remaining_time = self.object.khthi.tg_thi - dathi_duration
                 
         context['questions'] = self.object.get_ds_cauhoi()
         context['traloi'] = self.object.get_traloi().values()
         context['socaudatraloi'] = len(self.object.get_traloi())
         context['soluongcauhoi'] = len(self.object.get_ds_cauhoi())
-        
+        context['remaining_time'] = remaining_time
         return context
     
 def sinhde(request, pk):

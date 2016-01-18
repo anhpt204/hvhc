@@ -13,7 +13,7 @@ Làm bài thi
 <div class="jumbotron">
 
   <div class="floating-timer">
-    <label id="remaining_time">{{object.khthi.tg_thi}}</label>
+    <label id="remaining_time">{{remaining_time}}</label>
   </div>
 
 	<div class="floating-div">
@@ -21,7 +21,7 @@ Làm bài thi
   <h1>{{ object.khthi.ten }}</h1>
   
   <h4>Môn thi: {{ object.khthi.mon_thi }}</h4>
-  <h4>Họ tên: {{ object.thi_sinh.ho_ten }}</h4>
+  <h4>Họ tên: {{ object.thi_sinh }}</h4>
   <h4>Ngày: {{ object.khthi.ngay_thi|date:"d/m/Y" }}</h4>
   <h4>Thời gian bắt đầu: {{ object.khthi.tg_bat_dau|time:"H:i" }}</h4>
   <h4>Thời gian thi: {{ object.khthi.tg_thi}}</h4>
@@ -88,7 +88,12 @@ window.onbeforeunload = function (e) {
  function myTimer() {
      //var d = new Date();
      var t = document.getElementById("remaining_time").innerHTML;
+//     var t = localStorage.getItem("timeRemaining")
+//     if (!t){
+//     	t = t1;
+//     }
      t = parseInt(t) - 1;
+//     localStorage.setItem("timeRemaining", t);
      document.getElementById("remaining_time").innerHTML = t.toString();
  }
 </script>

@@ -25,9 +25,6 @@
 }
 
 .floating-div {
-	position:fixed;
-  	top: 0px;
-  	left:0px;
   	border-color: black;
 	border-width: medium;
 	background-color: blue;
@@ -55,7 +52,7 @@
 
 .question-list {
 	position:fixed;
-  	top: 250px;
+  	top: 0px;
   	left:0px;
   	border-color: black;
 	border-width: medium;

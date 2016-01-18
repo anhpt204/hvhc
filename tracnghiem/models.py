@@ -422,6 +422,8 @@ class KHThi(models.Model):
 #     tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
     tg_thi = PositiveIntegerField(verbose_name="Thời gian thi (phút)", default=30, help_text="Nhập thời gian thi tính bằng đơn vị phút")
     
+    tg_thi_batdau = TimeField(default=timezone.now)
+    
     de_thi_id = PositiveIntegerField(null=True)
     
     de_thi = TextField(default=json.dumps({}))
