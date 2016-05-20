@@ -28,7 +28,9 @@ urlpatterns = [
     url(r'^khthi/theodoithi/(?P<pk>[\d]+)/batdau/ketthuc/$', views.theodoithi_ketthuc, name="theodoithi_batdau"),
         
     url(r'^ketqua/$', views.theodoithi, name="giam thi theo doi thi"),
+    url(r'^export_bd/(?P<bts>[\d-]+)/$', views.export_bd, name="xuat bang diem"),
     
     url(r'^import/mc/(?P<pk>[\d]+)/$', views.import_mcquestion, name='import mcquestion data'),
+
     
 ]

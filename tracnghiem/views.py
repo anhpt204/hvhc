@@ -15,7 +15,7 @@ from tracnghiem.models import LogSinhDe, NganHangDe, Question, Answer, KHThi,\
 import json
 from django.views.generic.detail import DetailView
 from _io import BytesIO
-from tracnghiem.util import export_pdf
+from tracnghiem.util import *
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -273,12 +273,33 @@ def export(request, pk):
     response.write(pdf)
     return response
 
+def export_bd(request, bts):
+    ids = bts.split('-')
+    ids = [int(i) for i in ids]
+    baithis = []
+    for bt_id in ids:
+	baithi = BaiThi.objects.get(pk=bt_id)
+	baithis.append(baithi)
+
+    pdf = export_bangdiem(baithis)
+
+    file_name = 'bangdiem.pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+file_name
+     
+ 
+    response.write(pdf)
+    return response
+
+#    return HttpResponse(bts)
+
+
 def export_baithi_cauhoi(request, pk):
     baithi = BaiThi.objects.get(pk=pk)
     ds_cauhoi = baithi.get_ds_cauhoi()
          
     dethi = NganHangDe.objects.get(pk = baithi.khthi.de_thi_id)
-    pdf = export_pdf(dethi, ds_cauhoi)
+    pdf = export_baithi_pdf(dethi, ds_cauhoi, baithi)
     
     file_name = str(baithi.thi_sinh.ma_sv) + '.pdf'
     response = HttpResponse(content_type='application/pdf')
@@ -292,7 +313,7 @@ def export_baithi_cauhoi(request, pk):
 def boc_tron_de_thi(request, pk):
     khthi = KHThi.objects.get(pk=pk)
     # get nguoi boc de
-    nguoi_boc_de = GiaoVien.objects.get(user = request.user)
+    nguoi_boc_de = GiaoVien.objects.get(user__pk = request.user.pk)
     
     succ = khthi.boc_va_tron_de(nguoi_boc_de)
     logout(request)

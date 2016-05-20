@@ -43,7 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 # 	'permission',
 
-	'import_export',
+#	'import_export',
 	
     'daotao',
     'hrm',

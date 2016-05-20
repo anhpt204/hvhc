@@ -3,7 +3,7 @@
 from django.contrib.admin.options import TabularInline, ModelAdmin
 from tracnghiem.models import Answer, QuestionGroup, MCQuestion, TFQuestion, SinhDeConf, LogSinhDe,\
     NganHangDe, KHThi, BaiThi, ImportMCQuestion
-
+from django.http.response import HttpResponseRedirect
 from django.contrib import admin
 import json
 # from django.contrib.auth.decorators import permission_required
@@ -209,7 +209,11 @@ class KHThiAdmin(ModelAdmin):
 class DiemAdmin(ModelAdmin):
     model = BaiThi
     list_display = ['get_ma_sv', 'get_ho_ten', 'get_lop', 'get_mon_thi', 'diem']
-    
+    list_filter = ['thi_sinh__lop', 'khthi']
+
+    actions=['export_pdf']
+
+
     def get_ma_sv(self, obj):
         return obj.thi_sinh.ma_sv
     get_ma_sv.short_description = 'Mã SV'
@@ -225,6 +229,11 @@ class DiemAdmin(ModelAdmin):
     def get_mon_thi(self, obj):
         return obj.khthi.mon_thi
     get_mon_thi.short_description='Môn thi'
+
+    def export_pdf(self, request, queryset):
+	bts = '-'.join([str(obj.id) for obj in queryset])
+        return  HttpResponseRedirect('/hvhc/tracnghiem/export_bd/' + bts + '/')
+    export_pdf.short_description = "Xuất bảng điểm"
         
 class ImportMCQuestionAdmin(ModelAdmin):
     model = ImportMCQuestion
