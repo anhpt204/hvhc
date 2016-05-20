@@ -29,7 +29,7 @@ pdfmetrics.registerFont(TTFont('TimesBI', join(settings.BASE_DIR, 'static/fonts/
 
 styles = getSampleStyleSheet()
 PAGE_WIDTH, PAGE_HEIGHT = A4
-print PAGE_WIDTH, PAGE_HEIGHT, inch, PAGE_WIDTH/inch, PAGE_HEIGHT/inch 
+print PAGE_WIDTH, PAGE_HEIGHT, inch, PAGE_WIDTH/inch, PAGE_HEIGHT/inch
 
 
 question_style= ParagraphStyle(
@@ -56,7 +56,7 @@ question_style= ParagraphStyle(
             allowWidows= 1,
             allowOrphans= 0,
             textTransform=None,  # 'uppercase' | 'lowercase' | None
-            endDots=None,         
+            endDots=None,
             splitLongWords=1,
         )
 
@@ -84,7 +84,7 @@ answer_stype = ParagraphStyle(
             allowWidows= 1,
             allowOrphans= 0,
             textTransform=None,  # 'uppercase' | 'lowercase' | None
-            endDots=None,         
+            endDots=None,
             splitLongWords=1,
         )
 
@@ -104,8 +104,8 @@ def myLaterPages(canvas, doc):
     canvas.setFont('Times',13)
     canvas.drawString(PAGE_WIDTH/2.0, 0.75 * inch, "%d" % (doc.page))
     canvas.restoreState()
-    
-    
+
+
 def export_pdf(de_thi, dapan):
     '''
     export de thi trac nghiem ra pdf
@@ -119,7 +119,7 @@ def export_pdf(de_thi, dapan):
     table_data.append([u'', u'Đề gồm: ' + str(socau) + u' câu'])
 
     buf = BytesIO()
-    
+
 #     file_name = 'dethi.pdf'
     doc = SimpleDocTemplate(buf)
     pars = [Spacer(1, 0.1*inch)]
@@ -146,8 +146,8 @@ def export_pdf(de_thi, dapan):
                                       ]))
     pars.append(sv_info_table)
     pars.append(Spacer(1, 0.5*inch))
-    
-    
+
+
     n = 1
     for question, answers in dapan:
         # question
@@ -163,12 +163,12 @@ def export_pdf(de_thi, dapan):
             pars.append(Spacer(1, 0.03*inch))
 
         pars.append(Spacer(1, 0.05*inch))
-    
-    # ký    
+
+    # ký
     sig_table_data = [[u'-------HẾT--------', u'']]
     sig_table_data.append([u'' ,u'TRƯỞNG KHOA'])
     sig_table_data.append([u'' ,u'(Ký, họ tên)'])
-    
+
     sig_table = Table(sig_table_data, colWidths=[PAGE_WIDTH-300, 200])
     sig_table.setStyle(TableStyle([('FONT', (0,0), (1,0), 'Times', 13),
                                        ('FONT', (0,1), (1,1), 'TimesBd', 13),
@@ -177,7 +177,7 @@ def export_pdf(de_thi, dapan):
                                       ('SPAN',(0,0),(1,0)),
                                       ]))
     pars.append(sig_table)
-    
+
     doc.build(pars, onFirstPage=myFirstPage, onLaterPages=myLaterPages)
     # Get the value of the BytesIO buffer and write it to the response.
     pdf = buf.getvalue()
@@ -197,7 +197,7 @@ def export_baithi_pdf(de_thi, dapan, baithi):
     table_data.append([u'', u'Đề gồm: ' + str(socau) + u' câu'])
 
     buf = BytesIO()
-    
+
 #     file_name = 'dethi.pdf'
     doc = SimpleDocTemplate(buf)
     pars = [Spacer(1, 0.1*inch)]
@@ -224,8 +224,8 @@ def export_baithi_pdf(de_thi, dapan, baithi):
                                       ]))
     pars.append(sv_info_table)
     pars.append(Spacer(1, 0.5*inch))
-    
-    
+
+
     n = 1
     for question, answers in dapan:
         # question
@@ -241,12 +241,12 @@ def export_baithi_pdf(de_thi, dapan, baithi):
             pars.append(Spacer(1, 0.03*inch))
 
         pars.append(Spacer(1, 0.05*inch))
-    
-    # ký    
+
+    # ký
     sig_table_data = [[u'-------HẾT--------', u'']]
     sig_table_data.append([u'' ,u'TRƯỞNG KHOA'])
     sig_table_data.append([u'' ,u'(Ký, họ tên)'])
-    
+
     sig_table = Table(sig_table_data, colWidths=[PAGE_WIDTH-300, 200])
     sig_table.setStyle(TableStyle([('FONT', (0,0), (1,0), 'Times', 13),
                                        ('FONT', (0,1), (1,1), 'TimesBd', 13),
@@ -255,7 +255,76 @@ def export_baithi_pdf(de_thi, dapan, baithi):
                                       ('SPAN',(0,0),(1,0)),
                                       ]))
     pars.append(sig_table)
-    
+
+    doc.build(pars, onFirstPage=myFirstPage, onLaterPages=myLaterPages)
+    # Get the value of the BytesIO buffer and write it to the response.
+    pdf = buf.getvalue()
+    buf.close()
+    return pdf
+
+def export_baithi_dapan_pdf(de_thi, dapan, baithi):
+    '''
+    export de thi trac nghiem ra pdf
+    '''
+    socau = len(dapan)
+    table_data=[]
+    table_data.append([u'HỌC VIỆN HẬU CẦN', u'ĐÁP ÁN MÔN THI'])
+    table_data.append([u'%s' %de_thi.logSinhDe.monHoc.khoa.ten_dv, u'MÔN: ' + de_thi.logSinhDe.monHoc.ten_mon_thi])
+    table_data.append([u'', u'Đối tượng: ' + de_thi.logSinhDe.doiTuong.ten_dt])
+    table_data.append([u'', u'Thời gian: '])
+    table_data.append([u'', u'Đề gồm: ' + str(socau) + u' câu'])
+
+    buf = BytesIO()
+
+#     file_name = 'dethi.pdf'
+    doc = SimpleDocTemplate(buf)
+    pars = [Spacer(1, 0.1*inch)]
+#     pars = []
+    title_table = Table(table_data, colWidths=[(PAGE_WIDTH-100)/2.0]*2)
+    title_table.setStyle(TableStyle([('FONT', (0,0), (1,1), 'TimesBd', 13),
+                                     ('FONT', (0,2), (-1,-1), 'Times', 13),
+                                      ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                                      ]))
+    pars.append(title_table)
+
+    pars.append(Spacer(1, 0.5*inch))
+
+    sv_info_table_data = [[u'Mã môn học: '+ de_thi.logSinhDe.monHoc.ma_mon_thi + u'     - Số tín chỉ (hoặc đvht):    ' , u'Mã đề thi']]
+    sv_info_table_data.append([u'Lớp: ' ,de_thi.maDeThi + baithi.thi_sinh.ma_sv.split('-')[1]])
+    sv_info_table_data.append([u'Mã học viên, sinh viên: ',''])
+    sv_info_table_data.append([u'Họ tên học viên, sinh viên: ',''])
+
+    sv_info_table = Table(sv_info_table_data, colWidths=[PAGE_WIDTH-200, 100])
+    sv_info_table.setStyle(TableStyle([('FONT', (1,0), (-1,-1), 'TimesBd', 13),
+                                       ('FONT', (0,0), (0,-1), 'Times', 13),
+                                      ('ALIGN', (1,0), (-1,-1), 'CENTER'),
+                                      ('BOX', (1,0), (-1,-1), 1.25, colors.black),
+                                      ]))
+    pars.append(sv_info_table)
+    pars.append(Spacer(1, 0.5*inch))
+
+    for i in xrange(1, len(dapan)+1):
+        cau_hoi = str(i)
+        dap_an = dapan[cau_hoi]
+        # question
+        p = Paragraph(u'Câu ' + cau_hoi + ": " + dap_an, answer_stype)
+        pars.append(p)
+        pars.append(Spacer(1, 0.05*inch))
+
+    # ký
+    sig_table_data = [[u'-------HẾT--------', u'']]
+    sig_table_data.append([u'' ,u'TRƯỞNG KHOA'])
+    sig_table_data.append([u'' ,u'(Ký, họ tên)'])
+
+    sig_table = Table(sig_table_data, colWidths=[PAGE_WIDTH-300, 200])
+    sig_table.setStyle(TableStyle([('FONT', (0,0), (1,0), 'Times', 13),
+                                       ('FONT', (0,1), (1,1), 'TimesBd', 13),
+                                       ('FONT', (0,2), (1,2), 'TimesIt', 13),
+                                      ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                                      ('SPAN',(0,0),(1,0)),
+                                      ]))
+    pars.append(sig_table)
+
     doc.build(pars, onFirstPage=myFirstPage, onLaterPages=myLaterPages)
     # Get the value of the BytesIO buffer and write it to the response.
     pdf = buf.getvalue()
@@ -271,9 +340,9 @@ def export_bangdiem(baithi):
     table_data.append([u'BỘ QUỐC PHÒNG', u'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM'])
     table_data.append([u'HỌC VIỆN HẬU CẦN', u'Độc lập - Tự do - Hạnh phúc'])
     table_data.append([u'', u'Hà Nội, ngày ' + str(timezone.now().day) + u' tháng ' + str(timezone.now().month) + u' năm ' + str(timezone.now().year)])
-    
+
     buf = BytesIO()
-    
+
 #     file_name = 'dethi.pdf'
     doc = SimpleDocTemplate(buf)
     pars = [Spacer(1, 0.1*inch)]
@@ -301,7 +370,7 @@ def export_bangdiem(baithi):
                                       ]))
     pars.append(bd_title_table)
     pars.append(Spacer(1, 0.5*inch))
-    
+
     bd_table_data = [[u'STT', u'Họ tên', u'Điểm', u'Ghi chú']]
     n = 1
     for bt in baithi:
@@ -320,12 +389,12 @@ def export_bangdiem(baithi):
     pars.append(bd_table)
     pars.append(Spacer(1, 0.5*inch))
 
-	    
-    # ký    
+
+    # ký
     sig_table_data = [[u'-------HẾT--------', u'']]
     sig_table_data.append([u'' ,u'TRƯỞNG KHOA'])
     sig_table_data.append([u'' ,u'(Ký, họ tên)'])
-    
+
     sig_table = Table(sig_table_data, colWidths=[PAGE_WIDTH-300, 200])
     sig_table.setStyle(TableStyle([('FONT', (0,0), (1,0), 'Times', 13),
                                        ('FONT', (0,1), (1,1), 'TimesBd', 13),
@@ -334,12 +403,12 @@ def export_bangdiem(baithi):
                                       ('SPAN',(0,0),(1,0)),
                                       ]))
     pars.append(sig_table)
-    
+
     doc.build(pars, onFirstPage=myFirstPage, onLaterPages=myLaterPages)
     # Get the value of the BytesIO buffer and write it to the response.
     pdf = buf.getvalue()
     buf.close()
     return pdf
-    
+
 if __name__ == '__main__':
     pass

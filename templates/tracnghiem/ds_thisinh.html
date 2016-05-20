@@ -14,10 +14,10 @@ Danh sách thí sinh
   <h1>{{ khthi.ten }}</h1>
   <h4>Năm học: {{ khthi.nam_hoc }}</h4>
   <h4>Học kỳ: {{ khthi.hoc_ky }}</h4>
-  
+
   <h4>Môn thi: {{ khthi.mon_thi }}</h4>
   <h4>Ngày thi: {{ object.ngay_thi|date:"d/m/Y" }}</h4>
-  
+
   <h4>Giám thị:
   	<h5>
   	{% for gt in khthi.ds_giamthi.all %}
@@ -36,9 +36,9 @@ Danh sách thí sinh
   		<th scope="col">Đối tượng</th>
   		<th scope="col">Đề thi</th>
   		<th scope="col">Trả lời</th>
-  		<th scope="col">Đáp án</th>  		
+  		<th scope="col">Đáp án</th>
   	</tr>
-  	
+
 	{% for bt,noidung in ds_baithi.items %}
   	<tr>
   		<td align="center"> {{ forloop.counter }}</td>
@@ -48,13 +48,13 @@ Danh sách thí sinh
   		<td>{{bt.thi_sinh.lop.doi_tuong.ten_dt}}</td>
   		<td align="center"><a href="export/{{ bt.id }}/">PDF</a></td>
   		<td align="center">PDF</td>
-  		<td align="center">PDF</td>  		
+  		<td align="center"><a href="dapan_pdf/{{ bt.id }}/">PDF</a></td>  		
   	</tr>
-	
+
 	{% empty %}
-  		<li>Chưa có đề thi</li>	
+  		<li>Chưa có đề thi</li>
 	{% endfor %}
-  </table> 
+  </table>
 </div>
 
 
