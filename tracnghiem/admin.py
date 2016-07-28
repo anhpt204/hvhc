@@ -10,20 +10,21 @@ import json
 #from permission.decorators import permission_required
 from hvhc import PERM_BOC_DE, PERM_XEM_IN_DE
 from daotao.models import SinhVien
+from common.models import MyModelAdmin
 
 #Override modeladmin
-class MyModelAdmin(admin.ModelAdmin):
-    def get_form(self, request, obj=None, **kwargs):
-        if hasattr(self, 'field_permissions'):
-            user = request.user
-            for _field in self.opts.fields:
-                perm = self.field_permissions.get(_field.name)
-                if perm and not user.has_perm(perm):
-                    if self.exclude:
-                        self.exclude.append(_field.name)
-                    else:
-                        self.exclude=[_field.name]
-        return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+# class MyModelAdmin(admin.ModelAdmin):
+#     def get_form(self, request, obj=None, **kwargs):
+#         if hasattr(self, 'field_permissions'):
+#             user = request.user
+#             for _field in self.opts.fields:
+#                 perm = self.field_permissions.get(_field.name)
+#                 if perm and not user.has_perm(perm):
+#                     if self.exclude:
+#                         self.exclude.append(_field.name)
+#                     else:
+#                         self.exclude=[_field.name]
+#         return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
 
 
 class AnswerInLine(TabularInline):

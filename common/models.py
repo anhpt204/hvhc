@@ -10,6 +10,21 @@ from daotao.models import DoiTuong, MonThi, SinhVien
 from hrm.models import GiaoVien
 from hvhc import PERM_BOC_DE, PERM_XEM_IN_DE, HOC_KY, HK1, HK2
 from django.utils import timezone
+from django.contrib import admin
+
+class MyModelAdmin(admin.ModelAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        if hasattr(self, 'field_permissions'):
+            user = request.user
+            for _field in self.opts.fields:
+                perm = self.field_permissions.get(_field.name)
+                if perm and not user.has_perm(perm):
+                    if self.exclude:
+                        self.exclude.append(_field.name)
+                    else:
+                        self.exclude=[_field.name]
+        return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+
 
 class KHThiBase(models.Model):
     '''
