@@ -46,3 +46,12 @@ HOC_KY = (
           (HK1, 'Học kỳ 1'),
           (HK2, 'Học kỳ 2')
           )
+
+# lam tron diem
+DIEM_LAMTRON1 = 'Lam tron cach 1'
+DIEM_LAMTRON2 = 'Lam tron cach 2'
+
+DIEM_LAMTRON = (
+    (DIEM_LAMTRON1, 'Cách 1'),
+    (DIEM_LAMTRON2, 'Cách 2'),
+)

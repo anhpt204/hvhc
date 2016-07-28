@@ -19,6 +19,8 @@ from django.utils import timezone
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from openpyxl.reader.excel import load_workbook
 from django.forms.fields import DecimalField
+from common.models import KHThiBase
+
 # @python_2_unicode_compatible
 class QuestionGroup(models.Model):
     name = CharField(verbose_name="Nhóm câu hỏi",
@@ -388,40 +390,74 @@ class NganHangDe(models.Model):
         verbose_name_plural="Ngân hàng đề thi"
 
 
-class KHThi(models.Model):
+# class KHThi(models.Model):
+#     '''
+#     Thiet lap mot ca thi, trong do co danh sach cau hoi de tu do lam
+#     cac de thi cho tung sinh vien
+#     '''
+#     ten = CharField(verbose_name=u"Tên", max_length=200, blank=False)
+#
+#     nam_hoc = CharField(max_length=9,
+#                         verbose_name=u"Năm học",
+#                         help_text=u"Nhập năm học theo định dạng XXXX-XXXX. Ví dụ 2015-2016")
+#
+#     hoc_ky = CharField(max_length=3,
+#                               choices=HOC_KY,
+#                             default=HK1,
+#                             verbose_name=u"Học kỳ")
+#
+#     doi_tuong = ForeignKey(DoiTuong,
+#                            verbose_name=u"Đối tượng")
+#
+#     mon_thi = ForeignKey(MonThi, blank=False, null=False,
+#                          related_name='%(class)s_monthi_cathi',
+#                          verbose_name="Môn thi")
+#
+#     ds_giamthi = ManyToManyField(GiaoVien, related_name='%(class)s_giamthi_khthi',
+#                                  verbose_name=u'Danh sách giám thị coi thi')
+#
+#     ds_thisinh = ManyToManyField(SinhVien, blank=False, related_name='%(class)s_sinhvien_khthi',
+#                                 verbose_name=u'Danh sách thí sinh')
+# #     ds_thisinh.help_text = u'Tìm kiếm theo họ tên sinh viên hoặc mã lớp.'
+#
+#     ngay_thi = DateField(verbose_name="Ngày thi", default=timezone.now)
+#     tg_bat_dau=TimeField(verbose_name="Thời gian bắt đầu", default=timezone.now)
+# #     tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
+#     tg_thi = PositiveIntegerField(verbose_name="Thời gian thi (phút)", default=30, help_text="Nhập thời gian thi tính bằng đơn vị phút")
+#
+#     tg_thi_batdau = TimeField(default=timezone.now)
+#
+#     de_thi_id = PositiveIntegerField(null=True)
+#
+#     de_thi = TextField(default=json.dumps({}))
+#     # dict id cau hoi: id dap an dung
+#     dap_an = TextField(default=json.dumps({}))
+#
+#     tao_moi_de_thi = BooleanField(blank=False, null=False,
+#                                   verbose_name="Tạo mới đề thi cho các sinh viên",
+#                                   default=True)
+#
+#     so_luong_de = PositiveIntegerField(verbose_name="Số lượng đề thi tạo ra", default=0)
+#     so_luong_de.help_text = u'Nhập giá trị >= 0, nhập 0 sẽ sinh mỗi sinh viên một đề'
+#     ghichu=TextField(verbose_name="Ghi chú", blank=True, null=True)
+#
+#     nguoi_boc_de = ForeignKey(GiaoVien, verbose_name="Người bốc đề", null=True, blank=True)
+#     trang_thai =  CharField(max_length=30, null=True, blank=True,
+#         choices=TRANG_THAI_KHTHI, default=KHTHI_CHUATHI, verbose_name='Trạng thái')
+#
+#     class Meta:
+#         verbose_name = u"Kế hoạch thi - bốc đề"
+#         verbose_name_plural = u"Kế hoạch thi - bốc đề"
+#         permissions = ((PERM_BOC_DE, 'Người dùng được phép bốc đề'),
+#                         (PERM_XEM_IN_DE, 'Người dùng được phép xem và in đề'),)
+#
+#     def __unicode__(self):
+#         return u'%s' %(self.ten)
+class KHThi(KHThiBase):
     '''
     Thiet lap mot ca thi, trong do co danh sach cau hoi de tu do lam
     cac de thi cho tung sinh vien
     '''
-    ten = CharField(verbose_name=u"Tên", max_length=200, blank=False)
-
-    nam_hoc = CharField(max_length=9,
-                        verbose_name=u"Năm học",
-                        help_text=u"Nhập năm học theo định dạng XXXX-XXXX. Ví dụ 2015-2016")
-
-    hoc_ky = CharField(max_length=3,
-                              choices=HOC_KY,
-                            default=HK1,
-                            verbose_name=u"Học kỳ")
-
-    doi_tuong = ForeignKey(DoiTuong,
-                           verbose_name=u"Đối tượng")
-
-    mon_thi = ForeignKey(MonThi, blank=False, null=False,
-                         related_name='%(class)s_monthi_cathi',
-                         verbose_name="Môn thi")
-
-    ds_giamthi = ManyToManyField(GiaoVien, related_name='%(class)s_giamthi_khthi',
-                                 verbose_name=u'Danh sách giám thị coi thi')
-
-    ds_thisinh = ManyToManyField(SinhVien, blank=False, related_name='%(class)s_sinhvien_khthi',
-                                verbose_name=u'Danh sách thí sinh')
-#     ds_thisinh.help_text = u'Tìm kiếm theo họ tên sinh viên hoặc mã lớp.'
-
-    ngay_thi = DateField(verbose_name="Ngày thi", default=timezone.now)
-    tg_bat_dau=TimeField(verbose_name="Thời gian bắt đầu", default=timezone.now)
-#     tg_ket_thuc=TimeField(verbose_name="Thời gian kết thúc")
-    tg_thi = PositiveIntegerField(verbose_name="Thời gian thi (phút)", default=30, help_text="Nhập thời gian thi tính bằng đơn vị phút")
 
     tg_thi_batdau = TimeField(default=timezone.now)
 
@@ -439,7 +475,6 @@ class KHThi(models.Model):
     so_luong_de.help_text = u'Nhập giá trị >= 0, nhập 0 sẽ sinh mỗi sinh viên một đề'
     ghichu=TextField(verbose_name="Ghi chú", blank=True, null=True)
 
-    nguoi_boc_de = ForeignKey(GiaoVien, verbose_name="Người bốc đề", null=True, blank=True)
     trang_thai =  CharField(max_length=30, null=True, blank=True,
         choices=TRANG_THAI_KHTHI, default=KHTHI_CHUATHI, verbose_name='Trạng thái')
 

@@ -7,7 +7,7 @@ from django.http.response import HttpResponseRedirect
 from django.contrib import admin
 import json
 # from django.contrib.auth.decorators import permission_required
-from permission.decorators import permission_required
+#from permission.decorators import permission_required
 from hvhc import PERM_BOC_DE, PERM_XEM_IN_DE
 from daotao.models import SinhVien
 

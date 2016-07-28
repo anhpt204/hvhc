@@ -3,7 +3,7 @@ Created on Sep 18, 2015
 
 @author: pta
 '''
-from tuluan.models import DeThi, CaThi, BoDe
+from tuluan.models import DeThi, KHThiTuLuan, BoDe
 from os.path import basename, join
 from django.http import HttpResponse
 import os
@@ -25,7 +25,7 @@ def print_dt(request, pk):
         return response
     else:
         return HttpResponse(u'No file')
-    
+
 def view_pdf(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
@@ -36,7 +36,7 @@ def view_pdf(request, pk):
         return response
     else:
         return HttpResponse(u'No file %s' %(file_name))
-    
+
 def view_dethi(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
@@ -47,7 +47,7 @@ def view_dethi(request, pk):
         return response
     else:
         return HttpResponse(u'No file %s' %(file_name))
-    
+
 def view_dapan(request, pk):
     dt = DeThi.objects.get(pk=pk)
     if dt:
@@ -58,20 +58,20 @@ def view_dapan(request, pk):
         return response
     else:
         return HttpResponse(u'No file %s' %(file_name))
-    
-    
+
+
 class CaThiView(DetailView):
-    model = CaThi
+    model = KHThiTuLuan
     template_name='sinhde_tuluan.html'
-    
+
     def get_context_data(self, **kwargs):
         context = DetailView.get_context_data(self, **kwargs)
         # lay ngan hang de thi tuong ung voi doi_tuong va mon_thi
-        ngan_hang = BoDe.objects.filter(doi_tuong=self.object.doi_tuong, 
+        ngan_hang = BoDe.objects.filter(doi_tuong=self.object.doi_tuong,
                                                         mon_thi=self.object.mon_thi)
 
         context['ds_bo_de'] = ngan_hang
-         
+
         return context
 
 #     def get_context_data(self, **kwargs):
@@ -90,47 +90,46 @@ class CaThiView(DetailView):
 #         for ct in same_cathi:
 #             if ct != self.object:
 #                 de_da_thi.update(set(ct.ds_de_thi.all()))
-#             
+#
 #         # lay ngan hang de thi tuong ung voi doi_tuong va mon_thi
-#         ngan_hang = NganHangDeThiTuLuan.objects.filter(doi_tuong=self.object.doi_tuong, 
+#         ngan_hang = NganHangDeThiTuLuan.objects.filter(doi_tuong=self.object.doi_tuong,
 #                                                           mon_thi=self.object.mon_thi)
-#         
+#
 #         ngan_hang_dt = DeThiTuLuan.objects.filter(ngan_hang=ngan_hang[0])
 #         # tao danh sach de chua thi
 #         de_chua_thi = set(ngan_hang_dt).difference(de_da_thi)
 #         # lay so_de_thi
 #         de_thi_s = random.sample(de_chua_thi, self.object.so_de_thi)
-# 
+#
 #         for de_thi in de_thi_s:
 #             self.object.ds_de_thi.add(de_thi)
-#                 
+#
 #         self.object.save()
-#         
+#
 #         context['ds_de_thi'] = de_thi_s
-#         
+#
 #         return context
 
 def sinh_de(request, pk):
     # get ca thi
-    cathi_tuluan = CaThi.objects.get(pk=pk)
+    cathi_tuluan = KHThiTuLuan.objects.get(pk=pk)
     dethi_s = []
     # get bo de
     if request.POST:
         id_bode = int(request.POST['bo_de'])
-        
+
         bo_de = BoDe.objects.get(pk=id_bode)
         # get de thi cua bo de
         ds_de_thi = DeThi.objects.filter(ngan_hang=bo_de)
-        
+
         #sinh de
         dethi_s = random.sample(ds_de_thi, cathi_tuluan.so_de_thi)
-        
+
         cathi_tuluan.ds_de_thi.clear()
-        
+
         for dt in dethi_s:
             cathi_tuluan.ds_de_thi.add(dt)
-            
-        cathi_tuluan.save()
-        
-        return HttpResponseRedirect('/hvhc/tuluan/get_dt/%s/' %(pk))
 
+        cathi_tuluan.save()
+
+        return HttpResponseRedirect('/hvhc/tuluan/get_dt/%s/' %(pk))
