@@ -23,7 +23,7 @@ class LopAdmin(ModelAdmin):
 
 class TyLeDiemInLine(TabularInline):
     model = TyLeDiem
-    fields = ('diem', 'ty_le')
+    fields = ('loai_diem', 'ty_le', 'thu_tu_cham')
 
 class DoiTuongAdmin(ModelAdmin):
     model = DoiTuong
@@ -35,6 +35,7 @@ class DoiTuongAdmin(ModelAdmin):
 class MonThiAdmin(ModelAdmin):
     model=MonThi
 
+    
 class SinhVienAdmin(ModelAdmin):
     model = SinhVien
 
