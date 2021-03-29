@@ -33,7 +33,7 @@ pycparser==2.14
 pycrypto==2.6.1
 pycups==1.9.73
 pyglet==1.1.4
-Pygments==2.1
+Pygments==2.7.4
 pyparsing==2.0.3
 PyPDF2==1.25.1
 Pyro==3.14
