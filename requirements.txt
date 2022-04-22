@@ -35,7 +35,7 @@ pycups==1.9.73
 pyglet==1.1.4
 Pygments==2.1
 pyparsing==2.0.3
-PyPDF2==1.25.1
+PyPDF2==1.27.5
 Pyro==3.14
 pyRXP==2.1.0
 pyserial==3.0.1
